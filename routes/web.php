@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GamesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserListController;
 use App\Models\Game;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -27,7 +28,8 @@ Route::get('/', function () {
 //         'games' => $games,
 //     ]);
 // });
-Route::get('/', [GamesController::class, 'index']); // Devuelve datos en JSON
+// Route::get('/', [GamesController::class, 'index']); // Devuelve datos en JSON
+Route::get('/lists', [UserListController::class, 'index']);
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

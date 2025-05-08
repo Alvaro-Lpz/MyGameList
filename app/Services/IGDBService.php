@@ -49,4 +49,21 @@ class IGDBService
         $query = "fields name, rating, first_release_date; sort rating desc; limit {$limit};";
         return $this->query('games', $query);
     }
+
+    public function getGenres()
+    {
+        $query = "fields id, name; limit 100;";
+        return $this->query('genres', $query);
+    }
+
+    public function getGames($limit = 10)
+    {
+        $query = "
+        fields id, name, summary, first_release_date, cover.url, genres;
+        where cover != null & genres != null;
+        limit {$limit};
+    ";
+
+        return $this->query('games', $query);
+    }
 }

@@ -18,18 +18,9 @@ Route::get('/', function () {
     ]);
 });
 
-// Route::get('/', function () {
-//     return Inertia::render('GameList'); // Carga el componente React
-// });
-
-// Route::get('/', function () {
-//     $games = Game::all();
-//     return Inertia::render('GameList', [
-//         'games' => $games,
-//     ]);
-// });
-// Route::get('/', [GamesController::class, 'index']); // Devuelve datos en JSON
+Route::get('/', [GamesController::class, 'index']); // Devuelve datos en JSON
 Route::get('/lists', [UserListController::class, 'index']);
+Route::get('/games/{id}', [GamesController::class, 'show'])->name('game.detail');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

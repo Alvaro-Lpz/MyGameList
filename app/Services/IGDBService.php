@@ -43,10 +43,10 @@ class IGDBService
         return $response->json();
     }
 
-    // Ejemplo de método específico
     public function getTopGames($limit = 10)
     {
-        $query = "fields name, rating, first_release_date; sort rating desc; limit {$limit};";
+        // $query = "fields name, rating, first_release_date; sort rating desc; limit {$limit};";
+        $query = "fields name, cover.image_id, rating, first_release_date; sort rating desc; limit {$limit};";
         return $this->query('games', $query);
     }
 

@@ -27,7 +27,22 @@ class IGDBService
                 'grant_type' => 'client_credentials',
             ]);
 
-            return $response->json()['access_token'];
+            // Si la solicitud falló, muestra el error exacto
+            if (!$response->successful()) {
+                logger()->error('IGDB token request failed', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+                throw new \Exception('Error al obtener token de IGDB. Revisa los logs.');
+            }
+
+            $data = $response->json();
+            if (!isset($data['access_token'])) {
+                logger()->error('IGDB token response sin access_token', ['response' => $data]);
+                throw new \Exception('No se pudo obtener el access_token de IGDB.');
+            }
+
+            return $data['access_token'];
         });
     }
 

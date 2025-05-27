@@ -16,8 +16,8 @@ class UserController extends Controller
         return Inertia::render('Dashboard', ['user' => $user, 'lists' => $lists]);
     }
 
-    public function createList()
-    {
-        return Inertia::render('CreateList');
-    }
+    // public function createList()
+    // {
+    //     return Inertia::render('CreateList');
+    // }
 }

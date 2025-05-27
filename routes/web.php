@@ -20,7 +20,7 @@ Route::get('/', function () {
 });
 
 Route::get('/index', [GamesController::class, 'index']); // Devuelve datos en JSON
-Route::get('/lists', [UserListController::class, 'index']);
+// Route::get('/lists', [UserListController::class, 'index']);
 Route::get('/games/{id}', [GamesController::class, 'show'])->name('game.detail');
 
 Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
@@ -30,7 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/create-list', [UserController::class, 'createList'])->name('create-list');
+    // Con ::resource laravel crea todas las vistas necesarias para el crud
+    Route::resource('user-lists', UserListController::class);
 });
 
 Route::get('/home', function () {

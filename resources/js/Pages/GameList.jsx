@@ -28,6 +28,7 @@ export default function GameList() {
                     </li>
                 ))}
             </ul>
+            <Link href={route('user-lists.index')}>Ver mis listas</Link>
         </div>
     );
 }

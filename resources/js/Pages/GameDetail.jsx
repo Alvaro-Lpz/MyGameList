@@ -5,24 +5,33 @@ export default function GameDetail() {
   const { game } = usePage().props;
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">{game.title}</h1>
+    <div className="min-h-screen bg-gray-900 text-white font-mono p-6">
+      <div className="max-w-3xl mx-auto bg-gray-800 rounded-xl shadow-lg p-6 border border-purple-500">
+        <h1 className="text-4xl font-extrabold text-neon-green mb-6 text-center tracking-widest">
+          {game.title}
+        </h1>
 
-      {game.cover_url && (
-        <img
-          src={game.cover_url}
-          alt={`Portada de ${game.title}`}
-          className="w-64 h-auto rounded-lg mb-4"
-        />
-      )}
+        {game.cover_url && (
+          <div className="flex justify-center mb-6">
+            <img
+              src={game.cover_url}
+              alt={`Portada de ${game.title}`}
+              className="w-64 h-auto rounded-lg shadow-xl border-4 border-purple-600 hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        )}
 
-      <p className="mb-2">
-        {/* toFixed(1) sirve para mostrar el rating con un decimal. */}
-        <strong>Rating:</strong> {game.rating ? game.rating.toFixed(1) : 'No disponible'} 
-      </p>
-      <p className="mb-2">
-        <strong>Release Date:</strong> {game.first_release_date ?? 'Desconocida'}
-      </p>
+        <div className="space-y-4 text-lg">
+          <p>
+            <span className="text-purple-400 font-semibold">Rating:</span>{" "}
+            {game.rating ? game.rating.toFixed(1) : "No disponible"}
+          </p>
+          <p>
+            <span className="text-purple-400 font-semibold">Release Date:</span>{" "}
+            {game.first_release_date ?? "Desconocida"}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
+Route::get('/welcome', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
@@ -19,7 +19,7 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/index', [GamesController::class, 'index']); // Devuelve datos en JSON
+Route::get('/', [GamesController::class, 'index']); // Devuelve datos en JSON
 // Route::get('/lists', [UserListController::class, 'index']);
 Route::get('/games/{id}', [GamesController::class, 'show'])->name('game.detail');
 

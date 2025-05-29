@@ -22,6 +22,7 @@
         "vite": "^6.2.4"
     },
     "dependencies": {
+        "swiper": "^11.2.8",
         "ziggy-js": "^2.5.3"
     }
 }

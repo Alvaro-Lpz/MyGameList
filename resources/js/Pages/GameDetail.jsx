@@ -27,6 +27,10 @@ export default function GameDetail() {
 
           <div className="space-y-4 text-lg">
             <p>
+              <span className="text-purple-400 font-semibold">Summary:</span>{" "}
+              {game.summary ?? "No disponible"}
+            </p>
+            <p>
               <span className="text-purple-400 font-semibold">Rating:</span>{" "}
               {game.rating ? game.rating.toFixed(1) : "No disponible"}
             </p>

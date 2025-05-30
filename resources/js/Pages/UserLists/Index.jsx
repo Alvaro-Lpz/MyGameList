@@ -1,10 +1,15 @@
 import React from "react";
 import { Link, usePage } from "@inertiajs/react";
+import Header from "@/Components/Header";
 
 export default function Index() {
     const { user, lists } = usePage().props;
 
     return (
+        <>
+
+        <Header />
+
         <div className="min-h-screen bg-gray-900 text-white p-6">
             <div className="max-w-6xl mx-auto">
                 <h1 className="text-3xl font-bold text-neon-green tracking-widest mb-8">
@@ -68,5 +73,6 @@ export default function Index() {
                 </div> */}
             </div>
         </div>
+        </>
     );
 }

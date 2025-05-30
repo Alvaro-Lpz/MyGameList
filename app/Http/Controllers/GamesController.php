@@ -5,47 +5,44 @@ namespace App\Http\Controllers;
 use App\Models\Game;
 use App\Services\IGDBService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class GamesController extends Controller
 {
-    // public function index(IGDBService $igdb)
-    // {
-    //     // Obtener los 5 mejores juegos
-    //     $games = $igdb->getTopGames(5);
-
-    //     // Pasar los juegos a la vista 'index'
-    //     return view('index', compact('games'));
-    // }
 
     public function index()
     {
         $igdbService = new IGDBService();
         $games = $igdbService->getTopGames(10);
 
-        // Asegúrate de transformar los datos correctamente
         $games = collect($games)->map(function ($game) {
             return [
                 'id' => $game['id'],
                 'title' => $game['name'] ?? 'Sin título',
-                // Hacemos que la imagen tenga mas calidad con t_cover_big
                 'cover_url' => isset($game['cover']['image_id'])
                     ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$game['cover']['image_id']}.jpg"
                     : null,
             ];
         });
 
+        // Traer las listas del usuario autenticado (si hay sesión iniciada)
+        $userLists = Auth::check()
+            ? Auth::user()->lists()->select('id', 'title')->get()
+            : collect();
+
         return Inertia::render('GameList', [
             'games' => $games,
+            'userLists' => $userLists,
         ]);
     }
 
-    public function show($id)
+    public function gameDetail($id)
     {
         $igdbService = new IGDBService();
 
         $games = $igdbService->query('games', "
-        fields name, cover.image_id, rating, first_release_date;
+        fields name, summary, cover.image_id, rating, first_release_date;
         where id = {$id};
     ");
 
@@ -53,6 +50,7 @@ class GamesController extends Controller
             return [
                 'id' => $game['id'],
                 'title' => $game['name'] ?? 'Sin título',
+                'summary' => $game['summary'],
                 'cover_url' => isset($game['cover']['image_id'])
                     ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$game['cover']['image_id']}.jpg"
                     : null,
@@ -71,5 +69,57 @@ class GamesController extends Controller
         return Inertia::render('GameDetail', [
             'game' => $game,
         ]);
+    }
+
+    public function addToLists(Request $request, $igdb_id)
+    {
+        $request->validate([
+            'lists' => 'required|array',
+            'lists.*' => 'integer|exists:user_lists,id',
+        ]);
+
+        $user = Auth::user();
+
+        // Buscar o crear el juego localmente
+        $game = Game::where('igdb_id', $igdb_id)->first();
+
+        if (!$game) {
+            $igdbService = new IGDBService();
+
+            $query = "
+            fields name,cover.image_id,summary,first_release_date;
+            where id = {$igdb_id};
+        ";
+            $results = $igdbService->query('games', $query);
+
+            if (empty($results)) {
+                return redirect()->back()->withErrors(['error' => 'Juego no encontrado en IGDB.']);
+            }
+
+            $data = $results[0];
+
+            $game = Game::create([
+                'igdb_id' => $data['id'],
+                'title' => $data['name'] ?? 'Sin título',
+                'summary' => $data['summary'] ?? null,
+                'release_date' => isset($data['first_release_date'])
+                    ? \Carbon\Carbon::createFromTimestamp($data['first_release_date'])->toDateString()
+                    : null,
+                'cover_url' => isset($data['cover']['image_id'])
+                    ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$data['cover']['image_id']}.jpg"
+                    : null,
+            ]);
+        }
+
+        // Asociar el juego a las listas del usuario
+        foreach ($request->lists as $listId) {
+            $list = $user->lists()->where('id', $listId)->first();
+
+            if ($list) {
+                $list->games()->syncWithoutDetaching([$game->id]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Juego añadido a las listas seleccionadas.');
     }
 }

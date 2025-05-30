@@ -53,7 +53,7 @@ export default function Header() {
               {menuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded shadow-lg z-50">
                   <Link
-                    href="/profile"
+                    href="/user-lists"
                     className="block px-4 py-2 hover:bg-gray-600"
                   >
                     Perfil

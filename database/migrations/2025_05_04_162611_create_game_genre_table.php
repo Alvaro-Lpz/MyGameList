@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('game_genre', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('game_id');
-            $table->unsignedBigInteger('genre_id');
+            $table->unsignedBigInteger('game_id')->unique();
+            $table->unsignedBigInteger('genre_id')->unique();
             $table->timestamps();
 
             // $table->foreignId('game_id')->constrained()->onDelete('cascade');

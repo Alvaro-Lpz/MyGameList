@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('game_user_list', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('game_id');         // Columna para la clave foránea a games
-            $table->unsignedBigInteger('user_list_id');
+            $table->unsignedBigInteger('game_id')->unique();         // Columna para la clave foránea a games
+            $table->unsignedBigInteger('user_list_id')->unique();
             $table->timestamps();
 
             $table->foreign('game_id')->references('id')->on('games')->onDelete('cascade');

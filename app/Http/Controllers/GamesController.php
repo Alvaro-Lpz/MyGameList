@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\Genre;
 use App\Services\IGDBService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -87,7 +88,7 @@ class GamesController extends Controller
             $igdbService = new IGDBService();
 
             $query = "
-            fields name,cover.image_id,summary,first_release_date;
+            fields name,cover.image_id,genres,summary,first_release_date;
             where id = {$igdb_id};
         ";
             $results = $igdbService->query('games', $query);
@@ -102,6 +103,7 @@ class GamesController extends Controller
                 'igdb_id' => $data['id'],
                 'title' => $data['name'] ?? 'Sin título',
                 'summary' => $data['summary'] ?? null,
+                'genres' => $data['genres'] ?? null,
                 'release_date' => isset($data['first_release_date'])
                     ? \Carbon\Carbon::createFromTimestamp($data['first_release_date'])->toDateString()
                     : null,
@@ -109,7 +111,25 @@ class GamesController extends Controller
                     ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$data['cover']['image_id']}.jpg"
                     : null,
             ]);
+
+            // Asocia los generos al juego que se añade
+            if (!empty($data['genres'])) {
+                foreach ($data['genres'] as $genreId) {
+                    $genreData = $igdbService->query('genres', "fields name; where id = {$genreId};");
+
+                    if (!empty($genreData)) {
+                        $genre = Genre::updateOrCreate(
+                            ['igdb_id' => $genreData[0]['id']],
+                            ['name' => $genreData[0]['name']]
+                        );
+
+                        $game->genres()->syncWithoutDetaching([$genre->id]);
+                    }
+                }
+            }
         }
+
+
 
         // Asociar el juego a las listas del usuario
         foreach ($request->lists as $listId) {

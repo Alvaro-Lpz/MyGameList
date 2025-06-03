@@ -61,7 +61,7 @@ class IGDBService
     public function getTopGames($limit = 10)
     {
         // $query = "fields name, rating, first_release_date; sort rating desc; limit {$limit};";
-        $query = "fields name, cover.image_id, rating, first_release_date; sort rating desc; limit {$limit};";
+        $query = "fields name, cover.image_id, rating, first_release_date; where rating > 90; limit {$limit};";
         return $this->query('games', $query);
     }
 

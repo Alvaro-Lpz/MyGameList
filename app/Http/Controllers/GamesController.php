@@ -43,7 +43,7 @@ class GamesController extends Controller
         $igdbService = new IGDBService();
 
         $games = $igdbService->query('games', "
-        fields name, summary, cover.image_id, rating, first_release_date;
+        fields name, summary, storyline, cover.image_id, rating, first_release_date;
         where id = {$id};
     ");
 
@@ -52,6 +52,7 @@ class GamesController extends Controller
                 'id' => $game['id'],
                 'title' => $game['name'] ?? 'Sin título',
                 'summary' => $game['summary'],
+                'storyline' => $game['storyline'] ?? null, // Da problema con algunos juegos si no se comprueba si esto es null
                 'cover_url' => isset($game['cover']['image_id'])
                     ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$game['cover']['image_id']}.jpg"
                     : null,
@@ -129,8 +130,6 @@ class GamesController extends Controller
             }
         }
 
-
-
         // Asociar el juego a las listas del usuario
         foreach ($request->lists as $listId) {
             $list = $user->lists()->where('id', $listId)->first();
@@ -141,5 +140,35 @@ class GamesController extends Controller
         }
 
         return redirect()->back()->with('success', 'Juego añadido a las listas seleccionadas.');
+    }
+
+    public function search(Request $request)
+    {
+        $input = $request->input('search');
+
+        $a = new IGDBService();
+
+        // Hay que usar \"{$variable}\" para que asi coja el juego completo, si no, no funciona
+        // El propio search busca como LIKE en sql, por lo que con dejarlo asi ya busca resultados que contengan el input
+        $search = $a->query('games', "search \"{$input}\"; fields name, cover.image_id;");
+
+        $search = collect($search)->map(function ($s) {
+            return [
+                'id' => $s['id'],
+                'title' => $s['name'] ?? 'Sin título',
+                'cover_url' => isset($s['cover']['image_id'])
+                    ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$s['cover']['image_id']}.jpg"
+                    : null,
+            ];
+        });
+
+        $userLists = Auth::check()
+            ? Auth::user()->lists()->select('id', 'title')->get()
+            : collect();
+
+        return Inertia::render('Search', [
+            'search' => $search,
+            'lists' => $userLists
+        ]);
     }
 }

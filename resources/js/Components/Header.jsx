@@ -15,11 +15,15 @@ export default function Header() {
 
         {/* Buscador */}
         <div className="flex-1 mx-6">
-          <input
-            type="text"
-            placeholder="Buscar juegos..."
-            className="w-full px-4 py-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+          <form action={route('game.search')} method="get">
+            <input
+              type="text"
+              name="search"
+              id="search"
+              placeholder="Buscar juegos..."
+              className="w-full px-4 py-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            />
+          </form>
         </div>
 
         {/* Enlaces a la derecha */}
@@ -72,6 +76,6 @@ export default function Header() {
           )}
         </div>
       </div>
-    </header>
+    </header >
   );
 }

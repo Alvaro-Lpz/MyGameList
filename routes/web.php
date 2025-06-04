@@ -20,7 +20,9 @@ Route::get('/welcome', function () {
 });
 
 Route::get('/', [GamesController::class, 'index']); // Devuelve datos en JSON
+Route::get('/games/search', [GamesController::class, 'search'])->name('game.search');
 Route::get('/games/{id}', [GamesController::class, 'gameDetail'])->name('game.detail');
+
 
 Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 

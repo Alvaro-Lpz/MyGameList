@@ -124,7 +124,7 @@ export default function GameList() {
                       />
                     )}
                     <div className="p-3 text-center">
-                      <h3 className="text-lg font-semibold text-neon-green">
+                      <h3 className="text-lg font-semibold text-neon-green truncate">
                         {game.title}
                       </h3>
                     </div>

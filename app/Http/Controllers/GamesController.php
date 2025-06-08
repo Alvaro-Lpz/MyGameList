@@ -49,10 +49,11 @@ class GamesController extends Controller
 
         $game = collect($games)->map(function ($game) {
             return [
-                'id' => $game['id'],
+                'id' => $game['id'], // Este es el igdb_id
+                'igdb_id' => $game['id'], // Lo agregamos explícitamente
                 'title' => $game['name'] ?? 'Sin título',
                 'summary' => $game['summary'],
-                'storyline' => $game['storyline'] ?? null, // Da problema con algunos juegos si no se comprueba si esto es null
+                'storyline' => $game['storyline'] ?? null,
                 'cover_url' => isset($game['cover']['image_id'])
                     ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$game['cover']['image_id']}.jpg"
                     : null,
@@ -61,7 +62,7 @@ class GamesController extends Controller
                     ? \Carbon\Carbon::createFromTimestamp($game['first_release_date'])->toDateString()
                     : null,
             ];
-        })->first(); // obtener directamente el primero
+        })->first();
 
         // Verifica si no se encontró ningún juego
         if (!$game) {

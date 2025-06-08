@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GamesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserListController;
 use App\Models\Game;
@@ -33,7 +34,10 @@ Route::middleware('auth')->group(function () {
 
     // Con ::resource laravel crea todas las vistas necesarias para el crud
     Route::resource('user-lists', UserListController::class);
-    Route::post('/games/{igdb_id}/add-to-lists', [GamesController::class, 'addToLists']);
+    Route::prefix('games')->group(function () {
+        Route::post('/{igdb_id}/add-to-lists', [GamesController::class, 'addToLists']);
+        Route::post('/{igdb_id}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    });
 });
 
 Route::get('/home', function () {
@@ -42,7 +46,6 @@ Route::get('/home', function () {
             'user' => Auth::user(),
         ],
     ]);
-
 })->middleware(['auth', 'verified'])->name('home');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

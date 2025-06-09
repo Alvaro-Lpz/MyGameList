@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::post('/reviews/{reviewId}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::get('/games/search/genre', [GamesController::class, 'searchGenre'])->name('game.searchGenre');
 
     // Con ::resource laravel crea todas las vistas necesarias para el crud
     Route::resource('user-lists', UserListController::class);

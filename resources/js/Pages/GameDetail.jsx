@@ -54,6 +54,7 @@ export default function GameDetail() {
 
                     {/* Mostrar lista de reseñas */}
                     <ReviewList reviews={reviews} />
+
                 </div>
             </div>
         </>

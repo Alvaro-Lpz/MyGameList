@@ -76,7 +76,7 @@ class GamesController extends Controller
         );
 
         // Obtener las reviews relacionadas
-        $reviews = Review::with('user')
+        $reviews = Review::with(['user', 'comments.user'])
             ->where('game_id', $localGame->id)
             ->latest()
             ->get();

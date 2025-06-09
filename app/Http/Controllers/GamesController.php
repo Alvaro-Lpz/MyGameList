@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\Genre;
+use App\Models\Review;
 use App\Services\IGDBService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,19 +39,19 @@ class GamesController extends Controller
         ]);
     }
 
-    public function gameDetail($id)
+    public function gameDetail($igdb_id)
     {
         $igdbService = new IGDBService();
 
         $games = $igdbService->query('games', "
         fields name, summary, storyline, cover.image_id, rating, first_release_date;
-        where id = {$id};
+        where id = {$igdb_id};
     ");
 
-        $game = collect($games)->map(function ($game) {
+        $apiGame = collect($games)->map(function ($game) {
             return [
-                'id' => $game['id'], // Este es el igdb_id
-                'igdb_id' => $game['id'], // Lo agregamos explícitamente
+                'id' => $game['id'],
+                'igdb_id' => $game['id'],
                 'title' => $game['name'] ?? 'Sin título',
                 'summary' => $game['summary'],
                 'storyline' => $game['storyline'] ?? null,
@@ -64,13 +65,25 @@ class GamesController extends Controller
             ];
         })->first();
 
-        // Verifica si no se encontró ningún juego
-        if (!$game) {
+        if (!$apiGame) {
             abort(404, 'Juego no encontrado');
         }
 
+        // Buscar el juego en la base de datos o crearlo
+        $localGame = Game::firstOrCreate(
+            ['igdb_id' => $apiGame['id']],
+            ['title' => $apiGame['title']]
+        );
+
+        // Obtener las reviews relacionadas
+        $reviews = Review::with('user')
+            ->where('game_id', $localGame->id)
+            ->latest()
+            ->get();
+
         return Inertia::render('GameDetail', [
-            'game' => $game,
+            'game' => $apiGame,
+            'reviews' => $reviews,
         ]);
     }
 

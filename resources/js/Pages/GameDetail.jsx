@@ -2,12 +2,12 @@ import React from "react";
 import { usePage } from "@inertiajs/react";
 import Header from "@/Components/Header";
 import ReviewForm from "@/Pages/Reviews/ReviewForm";
+import ReviewList from "@/Pages/Reviews/ReviewList";
 
 export default function GameDetail() {
-    const { game } = usePage().props;
+    const { game, reviews } = usePage().props;
 
     return (
-        // Añadimos <> en vez de <div> para que no se añada ese <div> al cargar la página si no lo necesitamos
         <>
             <Header />
             <div className="min-h-screen bg-gray-900 text-white font-mono p-6">
@@ -31,14 +31,12 @@ export default function GameDetail() {
                             <span className="text-purple-400 font-semibold">
                                 Storyline:
                             </span>{" "}
-                            {/* Algunos juegos tienen su storyline vacío */}
                             {game.storyline ?? game.summary}
                         </p>
                         <p>
                             <span className="text-purple-400 font-semibold">
                                 Rating:
                             </span>{" "}
-                            {/* Lo muestra solo con un decimal */}
                             {game.rating
                                 ? game.rating.toFixed(1)
                                 : "No disponible"}
@@ -50,8 +48,13 @@ export default function GameDetail() {
                             {game.first_release_date ?? "Desconocida"}
                         </p>
                     </div>
+
+                    {/* Mostrar formulario para nueva reseña */}
+                    <ReviewForm igdb_id={game.id} />
+
+                    {/* Mostrar lista de reseñas */}
+                    <ReviewList reviews={reviews} />
                 </div>
-                <ReviewForm igdb_id={game.igdb_id} />
             </div>
         </>
     );

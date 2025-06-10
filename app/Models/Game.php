@@ -9,7 +9,7 @@ class Game extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['igdb_id', 'title', 'summary', 'release_date', 'cover_url'];
+    protected $fillable = ['igdb_id', 'title', 'summary', 'release_date', 'cover_url', 'rating'];
 
     public function genres()
     {

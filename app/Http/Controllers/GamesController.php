@@ -158,89 +158,104 @@ class GamesController extends Controller
 
     public function search(Request $request)
     {
-        $input = $request->input('search');
+        $page = (int) $request->input('page', 1);
+        $perPage = 20;
+        $offset = ($page - 1) * $perPage;
 
-        $a = new IGDBService();
+        $genreId = $request->input('genre_id');
+        $minRating = $request->input('min_rating');
+        $searchTerm = $request->input('q');
 
-        // Hay que usar \"{$variable}\" para que asi coja el juego completo, si no, no funciona
-        // El propio search busca como LIKE en sql, por lo que con dejarlo asi ya busca resultados que contengan el input
-        $search = $a->query('games', "search \"{$input}\"; fields name, cover.image_id;");
+        // 1. Construir filtros IGDB
+        $filters = [];
 
-        $search = collect($search)->map(function ($s) {
-            return [
-                'id' => $s['id'],
-                'title' => $s['name'] ?? 'Sin título',
-                'cover_url' => isset($s['cover']['image_id'])
-                    ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$s['cover']['image_id']}.jpg"
-                    : null,
-            ];
-        });
+        if ($genreId) {
+            $genre = Genre::find($genreId);
+            if ($genre) {
+                $filters[] = "genres = ({$genre->igdb_id})";
+            }
+        }
+
+        if ($minRating) {
+            $filters[] = "rating >= {$minRating}";
+        }
+
+        if ($searchTerm) {
+            $filters[] = 'name ~ * "' . addslashes($searchTerm) . '"';
+        }
+
+        $filterString = empty($filters) ? '' : 'where ' . implode(' & ', $filters) . ';';
+
+        // 2. Armar consulta IGDB
+        $igdbQuery =
+            $filterString .
+            'fields name, summary, genres, cover.image_id, first_release_date, rating; ' .
+            "limit {$perPage}; offset {$offset};";
+
+        $igdbResults = (new IGDBService())->query('games', $igdbQuery);
+
+        $games = collect();
+
+        // 3. Guardar los juegos en base de datos y preparar la respuesta
+        foreach ($igdbResults as $data) {
+            $game = Game::updateOrCreate(
+                ['igdb_id' => $data['id']],
+                [
+                    'title' => $data['name'] ?? 'Sin título',
+                    'summary' => $data['summary'] ?? null,
+                    'release_date' => isset($data['first_release_date'])
+                        ? \Carbon\Carbon::createFromTimestamp($data['first_release_date'])->toDateString()
+                        : null,
+                    'cover_url' => isset($data['cover']['image_id'])
+                        ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$data['cover']['image_id']}.jpg"
+                        : null,
+                    'rating' => (array_key_exists('rating', $data) && is_numeric($data['rating']))
+                        ? round($data['rating'], 1)
+                        : null,
+                ]
+            );
+
+            if (isset($data['genres'])) {
+                foreach ($data['genres'] as $igdbGenreId) {
+                    $g = Genre::firstOrCreate(['igdb_id' => $igdbGenreId], ['name' => 'Pendiente']);
+                    $game->genres()->syncWithoutDetaching([$g->id]);
+                }
+            }
+
+            $games->push($game->load('genres'));
+        }
+
+        // 4. Preparar paginación manual
+        $searchResults = [
+            'data' => $games,
+            'current_page' => $page,
+            'links' => [
+                [
+                    'url' => $page > 1 ? route('game.search', ['page' => $page - 1] + $request->only('q', 'genre_id', 'min_rating')) : null,
+                    'label' => 'Anterior',
+                    'active' => false,
+                ],
+                [
+                    'url' => route('game.search', ['page' => $page + 1] + $request->only('q', 'genre_id', 'min_rating')),
+                    'label' => 'Siguiente',
+                    'active' => false,
+                ],
+            ],
+        ];
 
         $userLists = Auth::check()
             ? Auth::user()->lists()->select('id', 'title')->get()
             : collect();
 
         return Inertia::render('Search', [
-            'search' => $search,
-            'lists' => $userLists
-        ]);
-    }
-
-    public function searchGenre(Request $request)
-    {
-        $genreId = $request->input('genre_id');
-
-        // 1. Verificamos el género
-        $genre = Genre::findOrFail($genreId);
-
-        // 2. Juegos locales que tengan este género
-        $localGames = $genre->games()->get();
-
-        // Si hay pocos juegos locales, vamos a buscar más en IGDB
-        if ($localGames->count() < 10) {
-            $igdbService = new IGDBService();
-
-            $igdbGames = $igdbService->query('games', "
-            fields name, summary, genres, cover.image_id, first_release_date, rating;
-            where genres = ({$genre->igdb_id});
-            limit 10;
-        ");
-
-            foreach ($igdbGames as $igdbGame) {
-                // Intentar guardar el juego si no existe
-                $game = Game::firstOrCreate(
-                    ['igdb_id' => $igdbGame['id']],
-                    [
-                        'title' => $igdbGame['name'] ?? 'Sin título',
-                        'summary' => $igdbGame['summary'] ?? null,
-                        'release_date' => isset($igdbGame['first_release_date']) ? \Carbon\Carbon::createFromTimestamp($igdbGame['first_release_date'])->toDateString() : null,
-                        'cover_url' => isset($igdbGame['cover']['image_id']) ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$igdbGame['cover']['image_id']}.jpg" : null,
-                    ]
-                );
-
-                // Asignar géneros si vienen de la API
-                if (isset($igdbGame['genres'])) {
-                    foreach ($igdbGame['genres'] as $igdbGenreId) {
-                        $g = Genre::firstOrCreate(['igdb_id' => $igdbGenreId], ['name' => 'Pendiente']);
-                        // Relación many-to-many (evita duplicados)
-                        $game->genres()->syncWithoutDetaching([$g->id]);
-                    }
-                }
-            }
-
-            // Recargamos los juegos ya con los nuevos
-            $localGames = $genre->games()->get();
-        }
-
-        return Inertia::render('Search', [
-            'search' => $localGames->map(function ($game) {
-                return [
-                    'id' => $game->igdb_id,
-                    'title' => $game->title,
-                    'cover_url' => $game->cover_url,
-                ];
-            }),
-            'lists' => Auth::check() ? Auth::user()->lists()->select('id', 'title')->get() : collect(),
+            'search' => $searchResults,
+            'lists' => $userLists,
+            'genres' => Genre::select('id', 'name')->orderBy('name')->get(),
+            'filters' => [
+                'q' => $searchTerm,
+                'genre_id' => $genreId,
+                'min_rating' => $minRating,
+            ],
         ]);
     }
 }

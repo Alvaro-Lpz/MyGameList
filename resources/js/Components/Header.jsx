@@ -27,7 +27,7 @@ export default function Header() {
                 </div>
 
                 {/* Filtro por género */}
-                <div className="ml-4">
+                {/* <div className="ml-4">
                     <form action={route("game.searchGenre")} method="get">
                         <select
                             name="genre_id"
@@ -45,7 +45,7 @@ export default function Header() {
                             ))}
                         </select>
                     </form>
-                </div>
+                </div> */}
 
                 {/* Enlaces a la derecha */}
                 <div className="relative">

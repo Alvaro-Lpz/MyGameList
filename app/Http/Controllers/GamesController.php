@@ -162,13 +162,14 @@ class GamesController extends Controller
         $perPage = 20;
         $offset = ($page - 1) * $perPage;
 
+        $searchTerm = $request->input('q');
         $genreId = $request->input('genre_id');
         $minRating = $request->input('min_rating');
-        $searchTerm = $request->input('q');
+        $sortBy = $request->input('sort_by');
 
-        // 1. Construir filtros IGDB
         $filters = [];
 
+        // Filtro por género (usamos el igdb_id, no el interno)
         if ($genreId) {
             $genre = Genre::find($genreId);
             if ($genre) {
@@ -176,28 +177,54 @@ class GamesController extends Controller
             }
         }
 
+        // Filtro por rating
         if ($minRating) {
             $filters[] = "rating >= {$minRating}";
         }
 
+        // Solo agregamos filtro por nombre si no estamos usando `search`
+        $useSearch = false;
+        $searchQuery = '';
         if ($searchTerm) {
-            $filters[] = 'name ~ * "' . addslashes($searchTerm) . '"';
+            $useSearch = true;
+            $searchQuery = 'search "' . addslashes($searchTerm) . '"; ';
         }
 
-        $filterString = empty($filters) ? '' : 'where ' . implode(' & ', $filters) . ';';
+        // Construcción del filtro final
+        $filterString = !empty($filters) ? 'where ' . implode(' & ', $filters) . '; ' : '';
 
-        // 2. Armar consulta IGDB
-        $igdbQuery =
+        // Solo podemos ordenar si no hay término de búsqueda
+        $sortQuery = '';
+        if (!$useSearch && $sortBy) {
+            switch ($sortBy) {
+                case 'title_asc':
+                    $sortQuery = 'sort name asc;';
+                    break;
+                case 'rating_desc':
+                    $sortQuery = 'sort rating desc;';
+                    break;
+                case 'release_desc':
+                    $sortQuery = 'sort first_release_date desc;';
+                    break;
+            }
+        }
+
+        // Consulta final a IGDB
+        $igdbQuery = $searchQuery .
             $filterString .
             'fields name, summary, genres, cover.image_id, first_release_date, rating; ' .
+            $sortQuery .
             "limit {$perPage}; offset {$offset};";
 
         $igdbResults = (new IGDBService())->query('games', $igdbQuery);
 
         $games = collect();
 
-        // 3. Guardar los juegos en base de datos y preparar la respuesta
         foreach ($igdbResults as $data) {
+            if (!isset($data['id'])) {
+                continue;
+            }
+
             $game = Game::updateOrCreate(
                 ['igdb_id' => $data['id']],
                 [
@@ -225,36 +252,35 @@ class GamesController extends Controller
             $games->push($game->load('genres'));
         }
 
-        // 4. Preparar paginación manual
+        // Paginación manual
         $searchResults = [
             'data' => $games,
             'current_page' => $page,
             'links' => [
                 [
-                    'url' => $page > 1 ? route('game.search', ['page' => $page - 1] + $request->only('q', 'genre_id', 'min_rating')) : null,
+                    'url' => $page > 1 ? route('game.search', ['page' => $page - 1] + $request->only('q', 'genre_id', 'min_rating', 'sort_by')) : null,
                     'label' => 'Anterior',
                     'active' => false,
                 ],
                 [
-                    'url' => route('game.search', ['page' => $page + 1] + $request->only('q', 'genre_id', 'min_rating')),
+                    'url' => route('game.search', ['page' => $page + 1] + $request->only('q', 'genre_id', 'min_rating', 'sort_by')),
                     'label' => 'Siguiente',
                     'active' => false,
                 ],
             ],
         ];
 
-        $userLists = Auth::check()
-            ? Auth::user()->lists()->select('id', 'title')->get()
-            : collect();
-
         return Inertia::render('Search', [
             'search' => $searchResults,
-            'lists' => $userLists,
+            'lists' => Auth::check()
+                ? Auth::user()->lists()->select('id', 'title')->get()
+                : collect(),
             'genres' => Genre::select('id', 'name')->orderBy('name')->get(),
             'filters' => [
                 'q' => $searchTerm,
                 'genre_id' => $genreId,
                 'min_rating' => $minRating,
+                'sort_by' => $sortBy,
             ],
         ]);
     }

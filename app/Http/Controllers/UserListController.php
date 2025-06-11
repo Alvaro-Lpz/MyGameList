@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Game;
 use App\Models\User;
 use App\Models\UserList;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -13,59 +14,27 @@ class UserListController extends Controller
 {
     use AuthorizesRequests;
 
-    public function index()
+    public function show($username, $title)
     {
-        $user = Auth::user();
-        $lists = $user->lists()->with('games.genres')->get();
-        return Inertia::render('UserLists/Index', ['user' => $user, 'lists' => $lists]);
+        $user = User::where('name', $username)->firstOrFail();
+        $list = UserList::where('user_id', $user->id)
+            ->where('title', $title)
+            ->with('games.genres', 'user')
+            ->firstOrFail();
 
-    }
+        // $this->authorize('view', $list);
 
-        public function create()
-    {
-        return Inertia::render('UserLists/Create');
-    }
-
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        Auth::user()->lists()->create($data);
-
-        return redirect()->route('user-lists.index')->with('success', 'Lista creada correctamente.');
-    }
-
-    public function edit(UserList $userList)
-    {
-        $this->authorize('update', $userList);
-
-        return Inertia::render('UserLists/Edit', [
-            'list' => $userList
+        return Inertia::render('UserLists/Show', [
+            'list' => $list,
+            'user' => $user,
         ]);
     }
 
-    public function update(Request $request, UserList $userList)
+    public function removeGame(Request $request, UserList $userList, Game $game)
     {
-        $this->authorize('update', $userList);
+        $this->authorize('update', $userList); // Asegura que el usuario es el dueño
+        $userList->games()->detach($game->id);
 
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $userList->update($data);
-
-        return redirect()->route('user-lists.index')->with('success', 'Lista actualizada.');
-    }
-
-    public function destroy(UserList $userList)
-    {
-        $this->authorize('delete', $userList);
-        $userList->delete();
-
-        return redirect()->route('user-lists.index')->with('success', 'Lista eliminada.');
+        return back()->with('success', 'Juego eliminado de la lista.');
     }
 }

@@ -29,14 +29,27 @@ Route::get('/games/{id}', [GamesController::class, 'gameDetail'])->name('game.de
 Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/settings', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/settings', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/settings', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::prefix('usuario')->name('user.')->group(function () {
+        Route::get('{username}', [UserController::class, 'showProfile'])->name('profile');
+        Route::get('{username}/listas', [UserController::class, 'showLists'])->name('lists');
+        Route::get('{username}/listas/{title}', [UserListController::class, 'show'])->name('lists.show');
+        Route::get('{username}/reviews', [UserController::class, 'showReviews'])->name('reviews');
+    });
+
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
+
+    // Route::get('/listas/{title}', [UserListController::class, 'show'])->name('lists.show');
+    Route::delete('/listas/{userList}/juegos/{game}', [UserListController::class, 'removeGame'])->name('lists.removeGame');
 
     Route::post('/reviews/{reviewId}/comments', [CommentController::class, 'store'])->name('comments.store');
 
     // Con ::resource laravel crea todas las vistas necesarias para el crud
-    Route::resource('user-lists', UserListController::class);
+    Route::resource('perfil', UserListController::class);
+
     Route::prefix('games')->group(function () {
         Route::post('/{igdb_id}/add-to-lists', [GamesController::class, 'addToLists']);
         Route::post('/{igdb_id}/reviews', [ReviewController::class, 'store'])->name('reviews.store');

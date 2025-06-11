@@ -26,27 +26,6 @@ export default function Header() {
                     </form>
                 </div>
 
-                {/* Filtro por género */}
-                {/* <div className="ml-4">
-                    <form action={route("game.searchGenre")} method="get">
-                        <select
-                            name="genre_id"
-                            onChange={(e) => e.target.form.submit()}
-                            defaultValue=""
-                            className="px-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        >
-                            <option value="" disabled>
-                                Filtrar por género
-                            </option>
-                            {usePage().props.genres.map((genre) => (
-                                <option key={genre.id} value={genre.id}>
-                                    {genre.name}
-                                </option>
-                            ))}
-                        </select>
-                    </form>
-                </div> */}
-
                 {/* Enlaces a la derecha */}
                 <div className="relative">
                     {!auth.user ? (
@@ -89,10 +68,16 @@ export default function Header() {
                             {menuOpen && (
                                 <div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded shadow-lg z-50">
                                     <Link
-                                        href="/user-lists"
+                                        href={route("user.profile", auth.user.name)}
                                         className="block px-4 py-2 hover:bg-gray-600"
                                     >
                                         Perfil
+                                    </Link>
+                                    <Link
+                                        href="/settings"
+                                        className="block px-4 py-2 hover:bg-gray-600"
+                                    >
+                                        Configuración
                                     </Link>
                                     <Link
                                         href="/logout"

@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -59,5 +60,25 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function updateAvatar(Request $request)
+    {
+        // dd($request->all());
+        $request->validate([
+            'img' => ['required', 'image', 'max:2048'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user->img_path) {
+            Storage::disk('public')->delete($user->img_path);
+        }
+
+        $path = $request->file('img')->store('avatars', 'public');
+        $user->img_path = $path;
+        $user->save();
+
+        return redirect()->back()->with('success', 'Imagen de perfil actualizada.');
     }
 }

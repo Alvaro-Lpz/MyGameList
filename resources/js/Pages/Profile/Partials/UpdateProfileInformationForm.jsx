@@ -4,6 +4,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
+import UpdateAvatarForm from './UpdateAvatarForm';
 
 export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
     const user = usePage().props.auth.user;
@@ -11,6 +12,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
         useForm({
             name: user.name,
             email: user.email,
+            bio: user.bio || "",
         });
 
     const submit = (e) => {
@@ -69,6 +71,19 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                     </div>
                 )}
 
+                <div>
+                    <InputLabel htmlFor="bio" value="Biografía" />
+                    <textarea
+                        id="bio"
+                        className="mt-1 block w-full rounded p-2 border-gray-300 text-sm bg-gray-900 border-purple-500"
+                        value={data.bio || ""}
+                        onChange={(e) => setData("bio", e.target.value)}
+                        rows={4}
+                    />
+                    <InputError className="mt-2" message={errors.bio} />
+                </div>
+
+
                 <div className="flex items-center gap-4">
                     <PrimaryButton disabled={processing}>Guardar</PrimaryButton>
                     <Transition
@@ -81,7 +96,11 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
                         <p className="text-sm text-neon-green">Guardado correctamente.</p>
                     </Transition>
                 </div>
+
             </form>
+
+            <UpdateAvatarForm />
+
         </section>
     );
 }

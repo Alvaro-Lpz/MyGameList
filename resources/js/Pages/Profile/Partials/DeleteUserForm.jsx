@@ -46,41 +46,30 @@ export default function DeleteUserForm({ className = '' }) {
     };
 
     return (
-        <section className={`space-y-6 ${className}`}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Delete Account
-                </h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data
-                    will be permanently deleted. Before deleting your account,
-                    please download any data or information that you wish to
-                    retain.
-                </p>
-            </header>
+        <section className="bg-gray-800 p-6 rounded-lg shadow-md border border-red-600">
+            <h3 className="text-2xl font-semibold text-red-400 mb-4">Eliminar Cuenta</h3>
+            <p className="text-sm text-gray-300 mb-4">
+                Esta acción es irreversible. Todos tus datos serán eliminados permanentemente.
+            </p>
 
             <DangerButton onClick={confirmUserDeletion}>
-                Delete Account
+                Eliminar cuenta
             </DangerButton>
 
             <Modal show={confirmingUserDeletion} onClose={closeModal}>
-                <form onSubmit={deleteUser} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900">
-                        Are you sure you want to delete your account?
+                <form onSubmit={deleteUser} className="p-6 bg-gray-900 rounded shadow-lg">
+                    <h2 className="text-lg font-bold text-red-400 mb-2">
+                        ¿Estás seguro?
                     </h2>
-
-                    <p className="mt-1 text-sm text-gray-600">
-                        Once your account is deleted, all of its resources and
-                        data will be permanently deleted. Please enter your
-                        password to confirm you would like to permanently delete
-                        your account.
+                    <p className="text-sm text-gray-200 mb-4">
+                        Escribe tu contraseña para confirmar la eliminación de tu cuenta.
                     </p>
 
-                    <div className="mt-6">
+                    {/* input contraseña + botones */}
+                                        <div className="mt-6">
                         <InputLabel
                             htmlFor="password"
-                            value="Password"
+                            value="Contraseña"
                             className="sr-only"
                         />
 
@@ -95,7 +84,7 @@ export default function DeleteUserForm({ className = '' }) {
                             }
                             className="mt-1 block w-3/4"
                             isFocused
-                            placeholder="Password"
+                            placeholder="Contraseña"
                         />
 
                         <InputError
@@ -106,11 +95,11 @@ export default function DeleteUserForm({ className = '' }) {
 
                     <div className="mt-6 flex justify-end">
                         <SecondaryButton onClick={closeModal}>
-                            Cancel
+                            Cancelar
                         </SecondaryButton>
 
                         <DangerButton className="ms-3" disabled={processing}>
-                            Delete Account
+                            Eliminar cuenta
                         </DangerButton>
                     </div>
                 </form>

@@ -30,10 +30,17 @@ class UserListController extends Controller
         ]);
     }
 
-    public function removeGame(Request $request, UserList $userList, Game $game)
+    public function removeGame(Request $request, $listId, $gameId)
     {
-        $this->authorize('update', $userList); // Asegura que el usuario es el dueño
-        $userList->games()->detach($game->id);
+        $list = UserList::findOrFail($listId);
+
+        // Verifica que el usuario autenticado sea el dueño de la lista
+        if ($list->user_id !== Auth::id()) {
+            abort(403, 'No tienes permiso para modificar esta lista.');
+        }
+
+        // Elimina la relación sin borrar el juego de la base de datos
+        $list->games()->detach($gameId);
 
         return back()->with('success', 'Juego eliminado de la lista.');
     }

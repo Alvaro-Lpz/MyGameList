@@ -28,13 +28,13 @@ export default function Nav({ user, auth }) {
                     Inicio
                 </Link>
                 <Link
-                    href={route("user.lists", { username: auth.user.name })}
+                    href={route("user.lists", { username: user.name })}
                     className="text-purple-300 hover:text-neon-green transition"
                 >
                     Listas
                 </Link>
                 <Link
-                    href={route('user.reviews', { username: auth.user.name })}
+                    href={route('user.reviews', { username: user.name })}
                     className="text-purple-300 hover:text-neon-green transition"
                 >
                     Reviews

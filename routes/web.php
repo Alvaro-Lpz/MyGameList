@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
 
     // Route::get('/listas/{title}', [UserListController::class, 'show'])->name('lists.show');
-    Route::delete('/listas/{userList}/juegos/{game}', [UserListController::class, 'removeGame'])->name('lists.removeGame');
+    Route::delete('/listas/{list}/juegos/{game}', [UserListController::class, 'removeGame'])->name('lists.games.remove');
 
     Route::post('/reviews/{reviewId}/comments', [CommentController::class, 'store'])->name('comments.store');
 

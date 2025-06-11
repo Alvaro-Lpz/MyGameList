@@ -1,9 +1,21 @@
 import React from "react";
-import { usePage, Link } from "@inertiajs/react";
+import { usePage, Link, router } from "@inertiajs/react";
 import Header from "@/Components/Header";
+import Nav from "../User/Partials/Nav";
 
 export default function Show() {
     const { list, user, auth } = usePage().props;
+
+    const handleRemove = (gameId) => {
+        if (confirm("¿Estás seguro de que quieres eliminar este juego de la lista?")) {
+            router.delete(route("lists.games.remove", {
+                list: list.id,
+                game: gameId
+            }), {
+                preserveScroll: true
+            });
+        }
+    };
 
     return (
         <>
@@ -11,39 +23,8 @@ export default function Show() {
 
             <div className="min-h-screen bg-gray-900 text-white p-6">
                 <div className="max-w-6xl mx-auto">
-                    {/* Avatar + nombre */}
-                    <div className="flex items-center space-x-6 mb-6">
-                        <img
-                            src={`https://api.dicebear.com/7.x/lorelei/svg?seed=${user.name}`}
-                            alt={`Avatar de ${user.name}`}
-                            className="w-20 h-20 rounded-full border-4 border-purple-500"
-                        />
-                        <h1 className="text-3xl font-bold text-neon-green tracking-wide">
-                            {user.name}
-                        </h1>
-                    </div>
 
-                    {/* Navegación */}
-                    <nav className="flex space-x-6 border-b border-purple-700 pb-4 mb-8">
-                        <Link
-                            href={route("user.profile", auth.user.name)}
-                            className="text-purple-300 hover:text-neon-green transition"
-                        >
-                            Inicio
-                        </Link>
-                        <Link
-                            href={route("user.lists", { username: auth.user.name })}
-                            className="text-purple-300 hover:text-neon-green transition"
-                        >
-                            Listas
-                        </Link>
-                        <Link
-                            href={route("user.reviews", { username: auth.user.name })}
-                            className="text-purple-300 hover:text-neon-green transition"
-                        >
-                            Reseñas
-                        </Link>
-                    </nav>
+                    <Nav user={user} auth={auth} />
 
                     <section>
                         <h2 className="text-2xl font-bold text-purple-300 mb-4">
@@ -75,14 +56,14 @@ export default function Show() {
                                         <p className="text-sm text-purple-300">
                                             {game.genres?.map((g) => g.name).join(", ") || "Sin géneros"}
                                         </p>
-                                        <button
-                                            onClick={() =>
-                                                router.delete(route("lists.removeGame", { userList: list.id, game: game.id }))
-                                            }
-                                            className="mt-2 text-sm text-red-500 hover:text-red-700"
-                                        >
-                                            Eliminar de la lista
-                                        </button>
+                                        {auth.user.id === list.user.id && (
+                                            <button
+                                                onClick={() => handleRemove(game.id)}
+                                                className="text-red-400 hover:text-red-600 text-sm"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        )}
                                     </div>
 
                                 ))}

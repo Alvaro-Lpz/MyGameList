@@ -1,36 +1,44 @@
 import React, { useState } from "react";
 import { useForm } from "@inertiajs/react";
-import { route } from "ziggy-js";
-import { router } from "@inertiajs/react"; // helper de Ziggy para generar URLs de rutas Laravel
-
 
 export default function AddToList({ gameId, lists, swiper }) {
     const [open, setOpen] = useState(false);
-    const [selectedLists, setSelectedLists] = useState([]);
-    const { post, processing } = useForm();
+
+    // Aseguramos que `lists` empieza como un array
+    const { data, setData, post, processing } = useForm({
+        lists: [],
+    });
 
     const toggleList = (listId) => {
-        setSelectedLists((prev) =>
-            prev.includes(listId)
-                ? prev.filter((id) => id !== listId)
-                : [...prev, listId]
-        );
+        const current = data.lists || []; // por si se resetea accidentalmente
+
+        const updated = current.includes(listId)
+            ? current.filter((id) => id !== listId)
+            : [...current, listId];
+
+        setData("lists", updated);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(`/games/${gameId}/add-to-lists`, { lists: selectedLists });
-        setOpen(false);
-        swiper?.autoplay?.start(); // Reanuda autoplay
+
+        post(`/games/${gameId}/add-to-lists`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setOpen(false);
+                swiper?.autoplay?.start();
+                setData("lists", []); // limpia selección
+            },
+        });
     };
 
     const handleToggle = () => {
         setOpen((prev) => {
             const next = !prev;
             if (next) {
-                swiper?.autoplay?.stop(); // Pausa autoplay
+                swiper?.autoplay?.stop();
             } else {
-                swiper?.autoplay?.start(); // Reanuda autoplay
+                swiper?.autoplay?.start();
             }
             return next;
         });
@@ -47,7 +55,7 @@ export default function AddToList({ gameId, lists, swiper }) {
 
             {open && (
                 <form
-                    onSubmit={handleSubmit} // Provisionalmente quito la clase w-64
+                    onSubmit={handleSubmit}
                     className="absolute right-0 mt-2 bg-gray-800 border border-purple-500 rounded-lg shadow-xl z-50 p-4"
                 >
                     <fieldset className="text-left">
@@ -58,11 +66,16 @@ export default function AddToList({ gameId, lists, swiper }) {
                         <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                             {lists.length > 0 ? (
                                 lists.map((list) => (
-                                    <label key={list.id} className="flex items-center gap-2 text-gray-300 text-sm">
+                                    <label
+                                        key={list.id}
+                                        className="flex items-center gap-2 text-gray-300 text-sm"
+                                    >
                                         <input
                                             type="checkbox"
                                             value={list.id}
-                                            checked={selectedLists.includes(list.id)}
+                                            checked={data.lists.includes(
+                                                list.id
+                                            )}
                                             onChange={() => toggleList(list.id)}
                                             className="accent-purple-500"
                                         />
@@ -70,14 +83,16 @@ export default function AddToList({ gameId, lists, swiper }) {
                                     </label>
                                 ))
                             ) : (
-                                <p className="text-sm text-gray-400">No tienes listas creadas.</p>
+                                <p className="text-sm text-gray-400">
+                                    No tienes listas creadas.
+                                </p>
                             )}
                         </div>
                     </fieldset>
 
                     <button
                         type="submit"
-                        disabled={processing || selectedLists.length === 0}
+                        disabled={processing || data.lists.length === 0}
                         className="mt-3 bg-purple-700 hover:bg-neon-green text-white font-medium py-1 px-3 rounded text-sm transition disabled:opacity-50"
                     >
                         Añadir
@@ -87,4 +102,3 @@ export default function AddToList({ gameId, lists, swiper }) {
         </div>
     );
 }
-

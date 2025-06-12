@@ -50,26 +50,33 @@ export default function Profile() {
                             ) : (
                                 <div className="space-y-6">
                                     {recentReviews.map((review) => (
-                                        <div
-                                            key={review.id}
-                                            className="bg-gray-800 p-4 rounded-lg shadow border border-purple-600"
-                                        >
+                                        <div key={review.id} className="bg-gray-800 p-4 rounded-lg shadow border border-purple-600">
                                             <div className="flex items-start space-x-4">
                                                 {review.game?.cover_url && (
-                                                    <img
-                                                        src={review.game.cover_url}
-                                                        alt={review.game.title}
-                                                        className="w-24 h-32 object-cover rounded border border-purple-500"
-                                                    />
+                                                    <Link href={route("game.detail", { id: review.game.id })}>
+                                                        <img
+                                                            src={review.game.cover_url}
+                                                            alt={review.game.title}
+                                                            className="w-24 h-32 object-cover rounded border border-purple-500 hover:opacity-80 transition"
+                                                        />
+                                                    </Link>
                                                 )}
                                                 <div>
                                                     <h3 className="text-xl font-semibold text-neon-green">
-                                                        {review.game.title}
+                                                        <Link
+                                                            href={route("game.detail", { id: review.game.id })}
+                                                            className="hover:underline"
+                                                        >
+                                                            {review.game.title}
+                                                        </Link>
                                                     </h3>
                                                     <div className="mt-2">
-                                                        <span className="text-purple-400 font-semibold">
-                                                            {user.name}
-                                                        </span>{" "}
+                                                        <Link
+                                                            href={route("user.profile", review.user.name)}
+                                                            className="text-purple-400 font-semibold hover:underline"
+                                                        >
+                                                            {review.user.name}
+                                                        </Link>{" "}
                                                         valoró con{" "}
                                                         <span className="text-neon-green font-bold">
                                                             {review.rating}/10

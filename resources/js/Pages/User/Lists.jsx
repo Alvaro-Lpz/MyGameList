@@ -1,5 +1,5 @@
 import React from "react";
-import { usePage, Link } from "@inertiajs/react";
+import { usePage, Link, useForm, router } from "@inertiajs/react";
 import Header from "@/Components/Header";
 import Nav from "./Partials/Nav";
 
@@ -26,11 +26,9 @@ export default function Lists() {
                                 {lists.map((list) => (
                                     <div
                                         key={list.id}
-                                        className="bg-gray-800 border border-purple-600 rounded-xl p-4 shadow hover:shadow-lg transition"
+                                        className="bg-gray-800 border border-purple-600 rounded-xl p-4 shadow hover:shadow-lg transition relative"
                                     >
-                                        <h3 className="text-xl font-semibold text-neon-green mb-2 truncate">
-                                            {list.title}
-                                        </h3>
+                                        <h3 className="text-xl font-semibold text-neon-green mb-2 truncate">{list.title}</h3>
                                         <p className="text-gray-300 text-sm mb-4 line-clamp-3">
                                             {list.description || "Sin descripción."}
                                         </p>
@@ -46,15 +44,27 @@ export default function Lists() {
                                             ))}
                                         </div>
 
-                                        <Link
-                                            href={route("user.lists.show", {
-                                                username: user.name,
-                                                title: list.title,
-                                            })}
-                                            className="text-sm text-purple-300 hover:text-neon-green"
-                                        >
-                                            Ver lista completa →
-                                        </Link>
+                                        <div className="flex justify-between items-center mt-4">
+                                            <Link
+                                                href={route("user.lists.show", { username: auth.user.name, title: list.title })}
+                                                className="text-sm text-purple-300 hover:text-neon-green"
+                                            >
+                                                Ver lista completa →
+                                            </Link>
+
+                                            {auth.user.id === list.user_id && (
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm("¿Seguro que deseas eliminar esta lista?")) {
+                                                            router.delete(route("lists.destroy", list.id));
+                                                        }
+                                                    }}
+                                                    className="text-sm text-red-400 hover:text-red-600"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>

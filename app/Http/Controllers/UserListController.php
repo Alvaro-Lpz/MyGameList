@@ -30,6 +30,20 @@ class UserListController extends Controller
         ]);
     }
 
+    public function destroy($id)
+    {
+        $list = UserList::findOrFail($id);
+
+        // Verifica que el usuario autenticado sea el dueño de la lista
+        if ($list->user_id !== Auth::id()) {
+            abort(403, 'No tienes permiso para eliminar esta lista.');
+        }
+
+        $list->delete();
+
+        return back()->with('success', 'Lista eliminada correctamente.');
+    }
+
     public function removeGame(Request $request, $listId, $gameId)
     {
         $list = UserList::findOrFail($listId);

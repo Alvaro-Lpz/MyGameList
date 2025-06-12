@@ -16,7 +16,7 @@ class UserController extends Controller
         $listsCount = $user->lists()->count();
         $reviewsCount = $user->reviews()->count();
         $recentReviews = $user->reviews()
-            ->with('game')
+            ->with('game', 'user')
             ->orderByDesc('created_at')
             ->take(5)
             ->get();

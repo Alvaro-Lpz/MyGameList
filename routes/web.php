@@ -12,27 +12,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/welcome', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
 
+// Rutas que cualquier usuario puede ver
 Route::get('/', [GamesController::class, 'index']); // Devuelve datos en JSON
 Route::get('/games/search', [GamesController::class, 'search'])->name('game.search');
 Route::get('/games/{id}', [GamesController::class, 'gameDetail'])->name('game.detail');
 
-
-Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
-
+// Rutas solo para usuarios autenticados
 Route::middleware('auth')->group(function () {
+
+    // Rutas para la configuracion de los usuarios
     Route::get('/settings', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/settings', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/settings', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Rutas para el perfil del usuario
     Route::prefix('usuario')->name('user.')->group(function () {
         Route::get('{username}', [UserController::class, 'showProfile'])->name('profile');
         Route::get('{username}/listas', [UserController::class, 'showLists'])->name('lists');
@@ -40,16 +34,19 @@ Route::middleware('auth')->group(function () {
         Route::get('{username}/reviews', [UserController::class, 'showReviews'])->name('reviews');
     });
 
+    // Cambiar la imagen de perfil
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
 
-    // Route::get('/listas/{title}', [UserListController::class, 'show'])->name('lists.show');
-    Route::delete('/listas/{list}/juegos/{game}', [UserListController::class, 'removeGame'])->name('lists.games.remove');
+    // Modificar las listas del usuario
+    Route::prefix('listas')->name('lists.')->group(function () {
+        Route::delete('deleteList/{list}', [UserListController::class, 'destroy'])->name('destroy');
+        Route::delete('{list}/juegos/{game}', [UserListController::class, 'removeGame'])->name('games.remove');
+    });
 
+    // Guardar el comentario de una review
     Route::post('/reviews/{reviewId}/comments', [CommentController::class, 'store'])->name('comments.store');
 
-    // Con ::resource laravel crea todas las vistas necesarias para el crud
-    Route::resource('perfil', UserListController::class);
-
+    // Rutas para las acciones que se pueden hacer con los juegos
     Route::prefix('games')->group(function () {
         Route::post('/{igdb_id}/add-to-lists', [GamesController::class, 'addToLists']);
         Route::post('/{igdb_id}/reviews', [ReviewController::class, 'store'])->name('reviews.store');

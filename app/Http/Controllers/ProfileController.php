@@ -66,7 +66,7 @@ class ProfileController extends Controller
     {
         // dd($request->all());
         $request->validate([
-            'img' => ['required', 'image', 'max:2048'],
+            'avatar' => ['required', 'image', 'max:2048'],
         ]);
 
         $user = $request->user();
@@ -75,7 +75,7 @@ class ProfileController extends Controller
             Storage::disk('public')->delete($user->img_path);
         }
 
-        $path = $request->file('img')->store('avatars', 'public');
+        $path = $request->file('avatar')->store('avatars', 'public');
         $user->img_path = $path;
         $user->save();
 

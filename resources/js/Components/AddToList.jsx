@@ -4,7 +4,7 @@ import { route } from "ziggy-js";
 import { router } from "@inertiajs/react"; // helper de Ziggy para generar URLs de rutas Laravel
 
 
-export default function AddToList({ gameId, lists }) {
+export default function AddToList({ gameId, lists, swiper }) {
     const [open, setOpen] = useState(false);
     const [selectedLists, setSelectedLists] = useState([]);
     const { post, processing } = useForm();
@@ -19,19 +19,27 @@ export default function AddToList({ gameId, lists }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        router.post(`/games/${gameId}/add-to-lists`, {
-            lists: selectedLists,
-        });
-
-        // Cierra el desplegable despues de enviar
+        post(`/games/${gameId}/add-to-lists`, { lists: selectedLists });
         setOpen(false);
+        swiper?.autoplay?.start(); // Reanuda autoplay
+    };
+
+    const handleToggle = () => {
+        setOpen((prev) => {
+            const next = !prev;
+            if (next) {
+                swiper?.autoplay?.stop(); // Pausa autoplay
+            } else {
+                swiper?.autoplay?.start(); // Reanuda autoplay
+            }
+            return next;
+        });
     };
 
     return (
         <div className="relative text-right">
             <button
-                onClick={() => setOpen((prev) => !prev)}
+                onClick={handleToggle}
                 className="text-sm bg-gray-900 text-white border border-purple-500 hover:text-neon-green rounded px-3 py-1 transition"
             >
                 Añadir a listas
@@ -39,8 +47,8 @@ export default function AddToList({ gameId, lists }) {
 
             {open && (
                 <form
-                    onSubmit={handleSubmit}
-                    className="absolute right-0 mt-2 w-64 bg-gray-800 border border-purple-500 rounded-lg shadow-xl z-10 p-4"
+                    onSubmit={handleSubmit} // Provisionalmente quito la clase w-64
+                    className="absolute right-0 mt-2 bg-gray-800 border border-purple-500 rounded-lg shadow-xl z-50 p-4"
                 >
                     <fieldset className="text-left">
                         <legend className="text-purple-300 font-semibold mb-2 text-sm">
@@ -79,3 +87,4 @@ export default function AddToList({ gameId, lists }) {
         </div>
     );
 }
+

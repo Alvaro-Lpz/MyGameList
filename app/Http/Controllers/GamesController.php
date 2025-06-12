@@ -28,7 +28,7 @@ class GamesController extends Controller
             ];
         });
 
-        // Traer las listas del usuario autenticado (si hay sesión iniciada)
+        // Traer las listas del usuario autenticado
         $userLists = Auth::check()
             ? Auth::user()->lists()->select('id', 'title')->get()
             : collect();
@@ -36,6 +36,10 @@ class GamesController extends Controller
         return Inertia::render('GameList', [
             'games' => $games,
             'userLists' => $userLists,
+            'recentReviews' => Review::with('user', 'game')
+                ->latest()
+                ->take(4)
+                ->get(),
         ]);
     }
 

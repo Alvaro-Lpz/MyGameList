@@ -50,7 +50,7 @@ export default function ReviewForm({ igdb_id }) {
 
             <button
                 type="submit"
-                className="bg-neon-green text-black font-bold py-2 px-4 rounded hover:bg-green-400 transition"
+                className="bg-neon-green font-bold py-2 px-4 rounded hover:bg-green-400 transition"
             >
                 Publicar reseña
             </button>

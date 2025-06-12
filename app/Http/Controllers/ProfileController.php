@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -80,5 +81,23 @@ class ProfileController extends Controller
         $user->save();
 
         return redirect()->back()->with('success', 'Imagen de perfil actualizada.');
+    }
+
+    public function updateBio(Request $request, $username)
+    {
+        $user = User::where('name', $username)->firstOrFail();
+
+        if ($user->id !== Auth::id()) {
+            abort(403, 'No tienes permiso para modificar esta biografía.');
+        }
+
+        $validated = $request->validate([
+            'bio' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $user->bio = $validated['bio'];
+        $user->save();
+
+        return back()->with('success', 'Biografía actualizada.');
     }
 }

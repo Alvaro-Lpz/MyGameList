@@ -1,10 +1,25 @@
-import React from "react";
-import { usePage, Link, router } from "@inertiajs/react";
+import React, { useState } from "react";
+import { usePage, Link, router, useForm } from "@inertiajs/react";
 import Header from "@/Components/Header";
 import Nav from "../User/Partials/Nav";
 
 export default function Show() {
     const { list, user, auth } = usePage().props;
+
+    const [editing, setEditing] = useState(false);
+    const { data, setData, patch, processing, errors } = useForm({
+        title: list.title,
+        description: list.description || "",
+    });
+
+    const handleUpdate = (e) => {
+        e.preventDefault();
+
+        patch(route("lists.update", list.id), {
+            preserveScroll: true,
+            onSuccess: () => setEditing(false),
+        });
+    };
 
     const handleRemove = (gameId) => {
         if (confirm("¿Estás seguro de que quieres eliminar este juego de la lista?")) {
@@ -20,20 +35,75 @@ export default function Show() {
     return (
         <>
             <Header />
-
             <div className="min-h-screen bg-gray-900 text-white p-6">
                 <div className="max-w-6xl mx-auto">
 
                     <Nav user={user} auth={auth} />
 
-                    <section>
-                        <h2 className="text-2xl font-bold text-purple-300 mb-4">
-                            {list.title}
-                        </h2>
-                        <p className="text-gray-300 mb-6">
-                            {list.description || "Sin descripción."}
-                        </p>
+                    <section className="mb-10">
+                        {auth.user.id === list.user.id && !editing ? (
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h2 className="text-2xl font-bold text-purple-300 mb-1">{list.title}</h2>
+                                    <p className="text-gray-300 mb-2">{list.description || "Sin descripción."}</p>
+                                </div>
+                                <button
+                                    onClick={() => setEditing(true)}
+                                    className="text-sm text-purple-300 hover:text-neon-green"
+                                >
+                                    Editar
+                                </button>
+                            </div>
+                        ) : auth.user.id === list.user.id && editing ? (
+                            <form onSubmit={handleUpdate} className="space-y-4 mb-6">
+                                <div>
+                                    <input
+                                        type="text"
+                                        value={data.title}
+                                        onChange={(e) => setData("title", e.target.value)}
+                                        className="w-full bg-gray-800 text-white p-2 rounded border border-purple-500"
+                                    />
+                                    {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
+                                </div>
+                                <div>
+                                    <textarea
+                                        value={data.description}
+                                        onChange={(e) => setData("description", e.target.value)}
+                                        rows={3}
+                                        className="w-full bg-gray-800 text-white p-2 rounded border border-purple-500"
+                                    />
+                                    {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
+                                </div>
+                                <div className="flex gap-4">
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="bg-neon-green px-4 py-2 rounded font-semibold hover:bg-green-300 transition-colors duration-200"
+                                    >
+                                        Guardar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setEditing(false);
+                                            setData("title", list.title);
+                                            setData("description", list.description || "");
+                                        }}
+                                        className="text-purple-300 hover:text-white bg-transparent hover:bg-red-600 px-4 py-2 rounded transition-colors duration-200"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            <>
+                                <h2 className="text-2xl font-bold text-purple-300 mb-1">{list.title}</h2>
+                                <p className="text-gray-300 mb-6">{list.description || "Sin descripción."}</p>
+                            </>
+                        )}
+                    </section>
 
+                    <section>
                         {list.games.length === 0 ? (
                             <p className="text-gray-400">Esta lista no tiene juegos.</p>
                         ) : (
@@ -59,15 +129,13 @@ export default function Show() {
                                         {auth.user.id === list.user.id && (
                                             <button
                                                 onClick={() => handleRemove(game.id)}
-                                                className="text-red-400 hover:text-red-600 text-sm"
+                                                className="text-red-400 hover:text-red-600 text-sm mt-2"
                                             >
                                                 Eliminar
                                             </button>
                                         )}
                                     </div>
-
                                 ))}
-
                             </div>
                         )}
                     </section>

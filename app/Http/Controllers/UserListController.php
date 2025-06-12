@@ -14,6 +14,20 @@ class UserListController extends Controller
 {
     use AuthorizesRequests;
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        $validated['user_id'] = Auth::id();
+
+        UserList::create($validated);
+
+        return redirect()->back()->with('success', 'Lista creada correctamente.');
+    }
+
     public function show($username, $title)
     {
         $user = User::where('name', $username)->firstOrFail();
@@ -28,6 +42,25 @@ class UserListController extends Controller
             'list' => $list,
             'user' => $user,
         ]);
+    }
+
+    public function update(Request $request, UserList $list)
+    {
+        if ($list->user_id !== Auth::id()) {
+            abort(403, 'No tienes permiso para editar esta lista.');
+        }
+
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $list->update($data);
+
+        return redirect()->route('user.lists.show', [
+            'username' => Auth::user()->name,
+            'title' => $list->title,
+        ])->with('success', 'Lista actualizada.');
     }
 
     public function destroy($id)

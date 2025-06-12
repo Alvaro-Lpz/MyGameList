@@ -33,4 +33,31 @@ class ReviewController extends Controller
 
         return redirect()->back()->with('success', '¡Reseña añadida con éxito!');
     }
+
+    public function update(Request $request, Review $review)
+    {
+        if ($review->user_id !== Auth::id()) {
+            abort(403, 'No puedes editar esta reseña.');
+        }
+
+        $validated = $request->validate([
+            'review_text' => 'required|string|max:1000',
+            'rating' => 'required|integer|min:1|max:10',
+        ]);
+
+        $review->update($validated);
+
+        return back()->with('success', 'Reseña actualizada correctamente.');
+    }
+
+    public function destroy(Review $review)
+    {
+        if ($review->user_id !== Auth::id()) {
+            abort(403, 'No tienes permiso para eliminar esta reseña.');
+        }
+
+        $review->delete();
+
+        return back()->with('success', 'Reseña eliminada correctamente.');
+    }
 }

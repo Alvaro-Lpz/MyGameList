@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
         Route::get('{username}/listas', [UserController::class, 'showLists'])->name('lists');
         Route::get('{username}/listas/{title}', [UserListController::class, 'show'])->name('lists.show');
         Route::get('{username}/reviews', [UserController::class, 'showReviews'])->name('reviews');
+        Route::patch('{username}/bio', [ProfileController::class, 'updateBio'])->name('bio.update');
     });
 
     // Cambiar la imagen de perfil
@@ -39,17 +40,22 @@ Route::middleware('auth')->group(function () {
 
     // Modificar las listas del usuario
     Route::prefix('listas')->name('lists.')->group(function () {
+        Route::post('/store', [UserListController::class, 'store'])->name('store');
+        Route::patch('update/{list}', [UserListController::class, 'update'])->name('update');
         Route::delete('deleteList/{list}', [UserListController::class, 'destroy'])->name('destroy');
         Route::delete('{list}/juegos/{game}', [UserListController::class, 'removeGame'])->name('games.remove');
     });
 
-    // Guardar el comentario de una review
-    Route::post('/reviews/{reviewId}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::prefix('reviews')->name('reviews.')->group(function () {
+        Route::patch('{review}/update', [ReviewController::class, 'update'])->name('update');
+        Route::delete('{review}/delete', [ReviewController::class, 'destroy'])->name('destroy');
+    });
 
     // Rutas para las acciones que se pueden hacer con los juegos
     Route::prefix('games')->group(function () {
         Route::post('/{igdb_id}/add-to-lists', [GamesController::class, 'addToLists']);
         Route::post('/{igdb_id}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+        Route::post('/reviews/{reviewId}/comments', [CommentController::class, 'store'])->name('comments.store');
     });
 });
 

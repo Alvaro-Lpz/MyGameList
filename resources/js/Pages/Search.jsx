@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { usePage, router } from "@inertiajs/react";
+import { usePage, router, Link } from "@inertiajs/react";
 import Header from "@/Components/Header";
 import AddToList from "@/Components/AddToList";
 
@@ -74,7 +74,7 @@ export default function Search() {
                         </select>
                         <button
                             type="submit"
-                            className="bg-neon-green text-black font-bold py-2 px-4 rounded hover:bg-green-400 transition col-span-full"
+                            className="bg-neon-green font-bold py-2 px-4 rounded hover:bg-green-400 transition col-span-full"
                         >
                             Buscar
                         </button>
@@ -90,27 +90,35 @@ export default function Search() {
                                     <div className="absolute top-3 right-3">
                                         <AddToList gameId={game.id} lists={lists} />
                                     </div>
-                                    {game.cover_url && (
-                                        <img
-                                            src={game.cover_url}
-                                            alt={`Portada de ${game.title}`}
-                                            className="w-full h-40 object-cover rounded-md mb-3 transition-transform duration-300 hover:scale-105"
-                                        />
-                                    )}
-                                    <h3 className="text-lg font-medium text-purple-200 mb-1 truncate">
-                                        {game.title}
-                                    </h3>
-                                    <div className="text-sm text-gray-400">
-                                        {game.genres.length > 0
-                                            ? game.genres.map((g) => g.name).join(", ")
-                                            : "Sin género"}
-                                    </div>
+
+                                    {/* Todo el bloque debe estar dentro del Link */}
+                                    <Link
+                                        href={route("game.detail", game.igdb_id)}
+                                        className="block"
+                                    >
+                                        {game.cover_url && (
+                                            <img
+                                                src={game.cover_url}
+                                                alt={`Portada de ${game.title}`}
+                                                className="w-full h-40 object-cover rounded-md mb-3 transition-transform duration-300 hover:scale-105"
+                                            />
+                                        )}
+                                        <h3 className="text-lg font-medium text-purple-200 mb-1 truncate">
+                                            {game.title}
+                                        </h3>
+                                        <div className="text-sm text-gray-400">
+                                            {game.genres.length > 0
+                                                ? game.genres.map((g) => g.name).join(", ")
+                                                : "Sin género"}
+                                        </div>
+                                    </Link>
                                 </div>
                             ))}
                         </div>
                     ) : (
                         <p className="text-gray-400 mt-6">No se encontraron resultados.</p>
                     )}
+
 
                     {/* Paginación: fuera del grid */}
                     {search?.links?.length > 1 && (
@@ -122,8 +130,8 @@ export default function Search() {
                                         disabled={!link.url}
                                         onClick={() => link.url && router.visit(link.url)}
                                         className={`px-4 py-2 rounded border border-purple-500 text-sm ${link.active
-                                                ? "bg-neon-green text-black font-bold"
-                                                : "bg-gray-800 text-purple-300 hover:bg-purple-600"
+                                            ? "bg-neon-green text-black font-bold"
+                                            : "bg-gray-800 text-purple-300 hover:bg-purple-600"
                                             }`}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />

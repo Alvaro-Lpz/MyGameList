@@ -33,6 +33,7 @@ export default function ReviewList({ reviews }) {
 
             {reviews.map((review) => {
                 const isReviewOwner = auth.user?.id === review.user.id;
+                const isModerator = auth.user?.role === "moderator";
 
                 return (
                     <div
@@ -95,7 +96,7 @@ export default function ReviewList({ reviews }) {
                             <>
                                 <p className="text-gray-200 mb-2">{review.review_text}</p>
 
-                                {isReviewOwner && (
+                                {(isReviewOwner || isModerator) && (
                                     <div className="flex gap-4 text-sm mt-1">
                                         <button
                                             onClick={() => setEditingReviewId(review.id)}
@@ -126,6 +127,7 @@ export default function ReviewList({ reviews }) {
                                 <h3 className="text-sm text-gray-400">Comentarios:</h3>
                                 {review.comments.map((comment) => {
                                     const isCommentOwner = auth.user?.id === comment.user_id;
+                                    const canManageComment = isCommentOwner || isModerator;
 
                                     return (
                                         <div
@@ -145,7 +147,7 @@ export default function ReviewList({ reviews }) {
                                                     </p>
                                                     <p className="text-gray-300">{comment.comment_text}</p>
 
-                                                    {isCommentOwner && (
+                                                    {canManageComment && (
                                                         <div className="flex gap-2 mt-1">
                                                             <button
                                                                 onClick={() => setEditingCommentId(comment.id)}

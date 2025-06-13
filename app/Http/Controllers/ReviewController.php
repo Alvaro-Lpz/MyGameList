@@ -52,7 +52,9 @@ class ReviewController extends Controller
 
     public function destroy(Review $review)
     {
-        if ($review->user_id !== Auth::id()) {
+        $user = Auth::user();
+
+        if ($review->user_id !== $user->id && $user->role !== 'moderator') {
             abort(403, 'No tienes permiso para eliminar esta reseña.');
         }
 

@@ -240,9 +240,6 @@ class GamesController extends Controller
                     'cover_url' => isset($data['cover']['image_id'])
                         ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$data['cover']['image_id']}.jpg"
                         : null,
-                    'rating' => (array_key_exists('rating', $data) && is_numeric($data['rating']))
-                        ? round($data['rating'], 1)
-                        : null,
                 ]
             );
 

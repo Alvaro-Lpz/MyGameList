@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('game_user_list', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('game_id')->unique();         // Columna para la clave foránea a games
+            $table->unsignedBigInteger('game_id')->unique();
             $table->unsignedBigInteger('user_list_id')->unique();
             $table->timestamps();
 

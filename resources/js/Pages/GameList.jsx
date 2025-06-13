@@ -58,7 +58,7 @@ export default function GameList() {
                         <div className="flex justify-center gap-4 mt-4">
                             <Link
                                 href={route("register")}
-                                className="px-6 py-3 bg-neon-green text-black font-bold rounded hover:bg-green-400 transition"
+                                className="px-6 py-3 bg-neon-green font-bold rounded hover:bg-green-400 transition"
                             >
                                 Únete ahora
                             </Link>
@@ -225,7 +225,24 @@ export default function GameList() {
                             </div>
                         ))}
                     </div>
+                    {/* Footer */}
+                    <footer className="mt-16 text-center text-sm text-gray-400 border-t border-purple-600 pt-6">
+                        <p className="mb-1">MyGameList</p>
+                        <p>
+                            Powered by{" "}
+                            <a
+                                href="https://www.igdb.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:underline"
+                                style={{ color: "#7c7cf7" }}
+                            >
+                                IGDB
+                            </a>
+                        </p>
+                    </footer>
                 </section>
+
             </div>
         </>
     );

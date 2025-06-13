@@ -8,22 +8,17 @@ export default function Header() {
     return (
         <header className="bg-gray-800 text-white shadow p-4">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
-                {/* Nombre de la web */}
-                <Link href="/" className="text-2xl font-bold text-neon-green">
-                    MyGameList
-                </Link>
-
-                {/* Buscador */}
-                <div className="flex-1 mx-6">
-                    <form action={route("game.search")} method="get">
-                        <input
-                            type="text"
-                            name="search"
-                            id="search"
-                            placeholder="Buscar juegos..."
-                            className="w-full px-4 py-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                    </form>
+                {/* Logo + Enlace Explorar */}
+                <div className="flex items-center space-x-6">
+                    <Link href="/" className="text-2xl font-bold text-neon-green">
+                        MyGameList
+                    </Link>
+                    <Link
+                        href={route("game.search")}
+                        className="text-purple-300 hover:text-neon-green font-semibold transition"
+                    >
+                        Explorar
+                    </Link>
                 </div>
 
                 {/* Enlaces a la derecha */}

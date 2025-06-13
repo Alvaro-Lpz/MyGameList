@@ -40,8 +40,10 @@ class CommentController extends Controller
 
     public function destroy(Comment $comment)
     {
-        if (Auth::id() !== $comment->user_id) {
-            abort(403);
+        $user = Auth::user();
+
+        if ($comment->user_id !== $user->id && $user->role !== 'moderator') {
+            abort(403, 'No tienes permiso para eliminar esta reseña.');
         }
 
         $comment->delete();

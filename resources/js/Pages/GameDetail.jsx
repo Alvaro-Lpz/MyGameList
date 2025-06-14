@@ -31,7 +31,13 @@ export default function GameDetail() {
                             <span className="text-purple-400 font-semibold">
                                 Storyline:
                             </span>{" "}
-                            {game.storyline ?? game.summary}
+                            {typeof game.storyline === "string" &&
+                            game.storyline.trim() !== ""
+                                ? game.storyline
+                                : typeof game.summary === "string" &&
+                                  game.summary.trim() !== ""
+                                ? game.summary
+                                : "No disponible"}
                         </p>
                         <p>
                             <span className="text-purple-400 font-semibold">
@@ -54,7 +60,6 @@ export default function GameDetail() {
 
                     {/* Mostrar lista de reseñas */}
                     <ReviewList reviews={reviews} />
-
                 </div>
             </div>
         </>

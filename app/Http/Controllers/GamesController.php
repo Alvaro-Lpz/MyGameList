@@ -57,7 +57,7 @@ class GamesController extends Controller
                 'id' => $game['id'],
                 'igdb_id' => $game['id'],
                 'title' => $game['name'] ?? 'Sin título',
-                'summary' => $game['summary'],
+                'summary' => isset($game['summary']),
                 'storyline' => $game['storyline'] ?? null,
                 'cover_url' => isset($game['cover']['image_id'])
                     ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$game['cover']['image_id']}.jpg"
@@ -234,6 +234,7 @@ class GamesController extends Controller
                 [
                     'title' => $data['name'] ?? 'Sin título',
                     'summary' => $data['summary'] ?? null,
+                    'storyline' => $data['storyline'] ?? null,
                     'release_date' => isset($data['first_release_date'])
                         ? \Carbon\Carbon::createFromTimestamp($data['first_release_date'])->toDateString()
                         : null,

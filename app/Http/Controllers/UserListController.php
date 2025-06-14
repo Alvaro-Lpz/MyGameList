@@ -36,8 +36,6 @@ class UserListController extends Controller
             ->with('games.genres', 'user')
             ->firstOrFail();
 
-        // $this->authorize('view', $list);
-
         return Inertia::render('UserLists/Show', [
             'list' => $list,
             'user' => $user,

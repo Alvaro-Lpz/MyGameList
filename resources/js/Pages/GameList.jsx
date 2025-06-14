@@ -187,22 +187,36 @@ export default function GameList() {
                                 className="bg-gray-900 p-6 rounded border border-purple-500 shadow"
                             >
                                 <div className="flex items-start gap-4">
-                                    {review.game?.cover_url && (
-                                        <img
-                                            src={review.game.cover_url}
-                                            alt={review.game.title}
-                                            className="w-20 h-28 object-cover rounded border border-purple-500"
-                                        />
-                                    )}
+                                    <Link
+                                        href={route(
+                                            "game.detail",
+                                            review.game?.igdb_id
+                                        )}
+                                        className="block w-24"
+                                    >
+                                        {review.game?.cover_url && (
+                                            <img
+                                                src={review.game.cover_url}
+                                                alt={`Portada de ${review.game.title}`}
+                                                className="w-24 h-32 object-cover rounded border border-purple-500"
+                                            />
+                                        )}
+                                    </Link>
                                     <div className="flex-1">
                                         <h3 className="text-neon-green font-bold text-lg mb-1">
                                             {review.game?.title}
                                         </h3>
                                         <div className="text-sm text-purple-300 mb-2">
                                             por{" "}
-                                            <span className="font-semibold">
+                                            <Link
+                                                href={route(
+                                                    "user.profile",
+                                                    review.user.name
+                                                )}
+                                                className="font-semibold text-white hover:underline"
+                                            >
                                                 {review.user.name}
-                                            </span>{" "}
+                                            </Link>
                                             —{" "}
                                             <span className="text-neon-green">
                                                 {review.rating}/10
@@ -242,7 +256,6 @@ export default function GameList() {
                         </p>
                     </footer>
                 </section>
-
             </div>
         </>
     );

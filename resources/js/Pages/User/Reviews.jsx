@@ -54,13 +54,25 @@ export default function Reviews() {
                                             {reviews.data.map((review) => (
                                                 <div key={review.id} className="bg-gray-800 p-4 rounded-lg border border-purple-600">
                                                     <div className="flex items-start space-x-4">
-                                                        {review.game.cover_url && (
+                                                        <Link
+                                                        href={route(
+                                                            "game.detail",
+                                                            review.game?.igdb_id
+                                                        )}
+                                                        className="block w-24"
+                                                    >
+                                                        {review.game
+                                                            ?.cover_url && (
                                                             <img
-                                                                src={review.game.cover_url}
-                                                                alt={review.game.title}
+                                                                src={
+                                                                    review.game
+                                                                        .cover_url
+                                                                }
+                                                                alt={`Portada de ${review.game.title}`}
                                                                 className="w-24 h-32 object-cover rounded border border-purple-500"
                                                             />
                                                         )}
+                                                    </Link>
                                                         <div className="flex-1">
                                                             <h3 className="text-xl font-semibold text-neon-green">{review.game.title}</h3>
 

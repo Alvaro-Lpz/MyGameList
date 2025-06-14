@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, usePage, useForm } from "@inertiajs/react";
+import { Link, usePage, useForm, router } from "@inertiajs/react";
 import Header from "@/Components/Header";
 import Nav from "./Partials/Nav";
 
@@ -192,28 +192,57 @@ export default function Profile() {
                                                 <div className="mt-8 flex justify-center">
                                                     <div className="flex gap-2 flex-wrap">
                                                         {recentReviews.links.map(
-                                                            (link, i) => (
-                                                                <button
-                                                                    key={i}
-                                                                    disabled={
-                                                                        !link.url
-                                                                    }
-                                                                    onClick={() =>
-                                                                        link.url &&
-                                                                        router.visit(
+                                                            (link, i) => {
+                                                                let page = null;
+                                                                if (link.url) {
+                                                                    const urlObj =
+                                                                        new URL(
                                                                             link.url
-                                                                        )
-                                                                    }
-                                                                    className={`px-4 py-2 rounded border border-purple-500 text-sm ${
-                                                                        link.active
-                                                                            ? "bg-neon-green text-black font-bold"
-                                                                            : "bg-gray-800 text-purple-300 hover:bg-purple-600"
-                                                                    }`}
-                                                                    dangerouslySetInnerHTML={{
-                                                                        __html: link.label,
-                                                                    }}
-                                                                />
-                                                            )
+                                                                        );
+                                                                    page =
+                                                                        urlObj.searchParams.get(
+                                                                            "page"
+                                                                        ) || 1;
+                                                                }
+
+                                                                return (
+                                                                    <button
+                                                                        key={i}
+                                                                        disabled={
+                                                                            !link.url
+                                                                        }
+                                                                        onClick={() => {
+                                                                            if (
+                                                                                !link.url
+                                                                            )
+                                                                                return;
+                                                                            router.get(
+                                                                                route(
+                                                                                    "user.profile",
+                                                                                    {
+                                                                                        username:
+                                                                                            user.name,
+                                                                                    }
+                                                                                ),
+                                                                                {
+                                                                                    page,
+                                                                                },
+                                                                                {
+                                                                                    preserveState: true,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                        className={`px-4 py-2 rounded border border-purple-500 text-sm ${
+                                                                            link.active
+                                                                                ? "bg-neon-green text-black font-bold"
+                                                                                : "bg-gray-800 text-purple-300 hover:bg-purple-600"
+                                                                        }`}
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: link.label,
+                                                                        }}
+                                                                    />
+                                                                );
+                                                            }
                                                         )}
                                                     </div>
                                                 </div>

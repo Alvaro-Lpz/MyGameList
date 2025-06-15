@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
         // Route::get('{username}/listas', [UserController::class, 'showLists'])->name('lists');
         // Route::get('{username}/listas/{title}', [UserListController::class, 'show'])->name('lists.show');
         // Route::get('{username}/reviews', [UserController::class, 'showReviews'])->name('reviews');
-        Route::patch('/usuario/{username}/bio', [ProfileController::class, 'updateBio'])->name('user.bio.update');
+        Route::patch('{username}/bio', [ProfileController::class, 'updateBio'])->name('bio.update');
     });
 
     // Cambiar la imagen de perfil

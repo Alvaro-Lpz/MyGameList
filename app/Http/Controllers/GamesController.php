@@ -80,16 +80,22 @@ class GamesController extends Controller
             ]);
         }
 
+        $userLists = Auth::check()
+            ? Auth::user()->lists()->select('id', 'title')->get()
+            : collect();
+
         // Cargar reviews relacionados al juego local
         $reviews = Review::with(['user', 'comments.user'])
             ->where('game_id', $localGame->id)
             ->latest()
             ->get();
 
+
         // Devolver vista con datos locales
         return Inertia::render('GameDetail', [
             'game' => $localGame,
             'reviews' => $reviews,
+            'userLists' => $userLists,
         ]);
     }
 

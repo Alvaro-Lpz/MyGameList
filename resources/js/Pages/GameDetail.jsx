@@ -3,9 +3,10 @@ import { usePage } from "@inertiajs/react";
 import Header from "@/Components/Header";
 import ReviewForm from "@/Pages/Reviews/ReviewForm";
 import ReviewList from "@/Pages/Reviews/ReviewList";
+import AddToList from "@/Components/AddToList"; // <-- Importa el componente
 
 export default function GameDetail() {
-    const { game, reviews } = usePage().props;
+    const { game, reviews, auth, userLists } = usePage().props;
 
     return (
         <>
@@ -23,6 +24,13 @@ export default function GameDetail() {
                                 alt={`Portada de ${game.title}`}
                                 className="w-64 h-auto rounded-lg shadow-xl border-4 border-purple-600 hover:scale-105 transition-transform duration-300"
                             />
+                        </div>
+                    )}
+
+                    {/* Botón para añadir a listas, solo si está autenticado */}
+                    {auth?.user && (
+                        <div className="flex justify-end mb-6">
+                            <AddToList gameId={game.igdb_id} lists={userLists} />
                         </div>
                     )}
 
@@ -55,10 +63,7 @@ export default function GameDetail() {
                         </p>
                     </div>
 
-                    {/* Mostrar formulario para nueva reseña */}
-                    <ReviewForm igdb_id={game.id} />
-
-                    {/* Mostrar lista de reseñas */}
+                    <ReviewForm igdb_id={game.igdb_id} />
                     <ReviewList reviews={reviews} />
                 </div>
             </div>

@@ -10,7 +10,7 @@ export default function Header() {
   const submitSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim() === "") return;
-    router.get(route("game.search"), { q: searchQuery });
+    router.get(route("user.search"), { q: searchQuery });
     setMobileMenuOpen(false);
   };
 
@@ -63,7 +63,7 @@ export default function Header() {
             href={route("game.search")}
             className="text-purple-300 hover:text-neon-green font-semibold transition"
           >
-            Explorar
+            Explorar juegos
           </Link>
 
           <form

@@ -17,6 +17,17 @@ use Inertia\Inertia;
 Route::get('/', [GamesController::class, 'index']); // Devuelve datos en JSON
 Route::get('/games/search', [GamesController::class, 'search'])->name('game.search');
 Route::get('/games/{id}', [GamesController::class, 'gameDetail'])->name('game.detail');
+Route::get('/search/users', [UserController::class, 'search'])->name('user.search');
+
+    // Rutas para el perfil del usuario
+    Route::prefix('usuario')->name('user.')->group(function () {
+        Route::get('{username}', [UserController::class, 'showProfile'])->name('profile');
+        Route::get('{username}/listas', [UserController::class, 'showLists'])->name('lists');
+        Route::get('{username}/listas/{title}', [UserListController::class, 'show'])->name('lists.show');
+        Route::get('{username}/reviews', [UserController::class, 'showReviews'])->name('reviews');
+        // Route::patch('{username}/bio', [ProfileController::class, 'updateBio'])->name('bio.update');
+    });
+
 
 // Rutas solo para usuarios autenticados
 Route::middleware('auth')->group(function () {
@@ -28,11 +39,11 @@ Route::middleware('auth')->group(function () {
 
     // Rutas para el perfil del usuario
     Route::prefix('usuario')->name('user.')->group(function () {
-        Route::get('{username}', [UserController::class, 'showProfile'])->name('profile');
-        Route::get('{username}/listas', [UserController::class, 'showLists'])->name('lists');
-        Route::get('{username}/listas/{title}', [UserListController::class, 'show'])->name('lists.show');
-        Route::get('{username}/reviews', [UserController::class, 'showReviews'])->name('reviews');
-        Route::patch('{username}/bio', [ProfileController::class, 'updateBio'])->name('bio.update');
+        // Route::get('{username}', [UserController::class, 'showProfile'])->name('profile');
+        // Route::get('{username}/listas', [UserController::class, 'showLists'])->name('lists');
+        // Route::get('{username}/listas/{title}', [UserListController::class, 'show'])->name('lists.show');
+        // Route::get('{username}/reviews', [UserController::class, 'showReviews'])->name('reviews');
+        Route::patch('/usuario/{username}/bio', [ProfileController::class, 'updateBio'])->name('user.bio.update');
     });
 
     // Cambiar la imagen de perfil

@@ -82,7 +82,7 @@ export default function Profile() {
                                             {user.bio ||
                                                 "Este usuario aún no ha escrito una biografía."}
                                         </p>
-                                        {auth.user.id === user.id && (
+                                        {auth.user && auth.user.id === user.id && (
                                             <button
                                                 onClick={() =>
                                                     setEditingBio(true)

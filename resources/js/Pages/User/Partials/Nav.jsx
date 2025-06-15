@@ -22,7 +22,7 @@ export default function Nav({ user, auth }) {
 
             <nav className="flex space-x-6 border-b border-purple-700 pb-4 mb-8">
                 <Link
-                    href={route('user.profile', auth.user.name)}
+                    href={route('user.profile', { username: user.name })}
                     className="text-purple-300 hover:text-neon-green transition"
                 >
                     Inicio

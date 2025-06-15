@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from 'react';
+import React, { useState } from "react";
 import { usePage, Link, useForm, router } from "@inertiajs/react";
 import Header from "@/Components/Header";
 import Nav from "./Partials/Nav";
@@ -34,7 +33,7 @@ export default function Lists() {
                     <Nav user={user} auth={auth} />
 
                     {/* Formulario para crear nueva lista (solo para el dueño del perfil) */}
-                    {auth.user.id === user.id && (
+                    {auth.user && auth.user.id === user.id && (
                         <div className="mb-8">
                             <button
                                 onClick={() => setOpen(!open)}
@@ -119,13 +118,13 @@ export default function Lists() {
 
                                         <div className="flex justify-between items-center mt-4">
                                             <Link
-                                                href={route("user.lists.show", { username: auth.user.name, title: list.title })}
+                                                href={route("user.lists.show", { username: user.name, title: list.title })}
                                                 className="text-sm text-purple-300 hover:text-neon-green"
                                             >
                                                 Ver lista completa →
                                             </Link>
 
-                                            {auth.user.id === list.user_id && (
+                                            {auth.user && auth.user.id === list.user_id && (
                                                 <button
                                                     onClick={() => {
                                                         if (confirm("¿Seguro que deseas eliminar esta lista?")) {
@@ -142,6 +141,7 @@ export default function Lists() {
                                 ))}
                             </div>
                         )}
+
                         {lists.links.length > 1 && (
                             <div className="mt-8 flex justify-center">
                                 <div className="flex gap-2 flex-wrap">

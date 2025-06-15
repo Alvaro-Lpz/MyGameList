@@ -22,22 +22,17 @@ export default function Show() {
     };
 
     const handleRemove = (gameId) => {
-        if (
-            confirm(
-                "¿Estás seguro de que quieres eliminar este juego de la lista?"
-            )
-        ) {
-            router.delete(
-                route("lists.games.remove", {
-                    list: list.id,
-                    game: gameId,
-                }),
-                {
-                    preserveScroll: true,
-                }
-            );
+        if (confirm("¿Estás seguro de que quieres eliminar este juego de la lista?")) {
+            router.delete(route("lists.games.remove", {
+                list: list.id,
+                game: gameId,
+            }), {
+                preserveScroll: true,
+            });
         }
     };
+
+    const isOwner = auth.user && auth.user.id === list.user.id;
 
     return (
         <>
@@ -47,7 +42,7 @@ export default function Show() {
                     <Nav user={user} auth={auth} />
 
                     <section className="mb-10">
-                        {auth.user.id === list.user.id && !editing ? (
+                        {isOwner && !editing ? (
                             <div className="flex justify-between items-start">
                                 <div>
                                     <h2 className="text-2xl font-bold text-purple-300 mb-1">
@@ -64,42 +59,28 @@ export default function Show() {
                                     Editar
                                 </button>
                             </div>
-                        ) : auth.user.id === list.user.id && editing ? (
-                            <form
-                                onSubmit={handleUpdate}
-                                className="space-y-4 mb-6"
-                            >
+                        ) : isOwner && editing ? (
+                            <form onSubmit={handleUpdate} className="space-y-4 mb-6">
                                 <div>
                                     <input
                                         type="text"
                                         value={data.title}
-                                        onChange={(e) =>
-                                            setData("title", e.target.value)
-                                        }
+                                        onChange={(e) => setData("title", e.target.value)}
                                         className="w-full bg-gray-800 text-white p-2 rounded border border-purple-500"
                                     />
                                     {errors.title && (
-                                        <p className="text-red-500 text-sm">
-                                            {errors.title}
-                                        </p>
+                                        <p className="text-red-500 text-sm">{errors.title}</p>
                                     )}
                                 </div>
                                 <div>
                                     <textarea
                                         value={data.description}
-                                        onChange={(e) =>
-                                            setData(
-                                                "description",
-                                                e.target.value
-                                            )
-                                        }
+                                        onChange={(e) => setData("description", e.target.value)}
                                         rows={3}
                                         className="w-full bg-gray-800 text-white p-2 rounded border border-purple-500"
                                     />
                                     {errors.description && (
-                                        <p className="text-red-500 text-sm">
-                                            {errors.description}
-                                        </p>
+                                        <p className="text-red-500 text-sm">{errors.description}</p>
                                     )}
                                 </div>
                                 <div className="flex gap-4">
@@ -115,10 +96,7 @@ export default function Show() {
                                         onClick={() => {
                                             setEditing(false);
                                             setData("title", list.title);
-                                            setData(
-                                                "description",
-                                                list.description || ""
-                                            );
+                                            setData("description", list.description || "");
                                         }}
                                         className="text-purple-300 hover:text-white bg-transparent hover:bg-red-600 px-4 py-2 rounded transition-colors duration-200"
                                     >
@@ -140,9 +118,7 @@ export default function Show() {
 
                     <section>
                         {list.games.length === 0 ? (
-                            <p className="text-gray-400">
-                                Esta lista no tiene juegos.
-                            </p>
+                            <p className="text-gray-400">Esta lista no tiene juegos.</p>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {list.games.map((game) => (
@@ -168,15 +144,12 @@ export default function Show() {
                                         </h3>
 
                                         <p className="text-sm text-purple-300">
-                                            {game.genres
-                                                ?.map((g) => g.name)
-                                                .join(", ") || "Sin géneros"}
+                                            {game.genres?.map((g) => g.name).join(", ") || "Sin géneros"}
                                         </p>
-                                        {auth.user.id === list.user.id && (
+
+                                        {isOwner && (
                                             <button
-                                                onClick={() =>
-                                                    handleRemove(game.id)
-                                                }
+                                                onClick={() => handleRemove(game.id)}
                                                 className="text-red-400 hover:text-red-600 text-sm mt-2"
                                             >
                                                 Eliminar

@@ -10,6 +10,21 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+
+        $users = User::withCount(['lists', 'reviews'])
+            ->where('name', 'like', '%' . $query . '%')
+            ->paginate(5)
+            ->withQueryString();
+
+        return Inertia::render('SearchResults', [
+            'users' => $users,
+            'query' => $query,
+        ]);
+    }
+
     public function showProfile($username)
     {
         $user = User::where('name', $username)->firstOrFail();

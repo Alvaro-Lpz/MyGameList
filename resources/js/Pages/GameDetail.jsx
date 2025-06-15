@@ -43,15 +43,15 @@ export default function GameDetail() {
                             <span className="text-purple-400 font-semibold">
                                 Rating:
                             </span>{" "}
-                            {game.rating
-                                ? game.rating.toFixed(1)
+                            {game.rating !== null && !isNaN(game.rating)
+                                ? Number(game.rating).toFixed(1)
                                 : "No disponible"}
                         </p>
                         <p>
                             <span className="text-purple-400 font-semibold">
                                 Release Date:
                             </span>{" "}
-                            {game.first_release_date ?? "Desconocida"}
+                            {game.release_date ?? "Desconocida"}
                         </p>
                     </div>
 

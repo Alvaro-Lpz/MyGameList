@@ -45,48 +45,50 @@ class GamesController extends Controller
 
     public function gameDetail($igdb_id)
     {
-        $igdbService = new IGDBService();
+        // 1. Buscar juego localmente
+        $localGame = Game::where('igdb_id', $igdb_id)->first();
 
-        $games = $igdbService->query('games', "
-        fields name, summary, storyline, cover.image_id, rating, first_release_date;
-        where id = {$igdb_id};
-    ");
+        // 2. Si no existe, consultar API y guardar
+        if (!$localGame) {
+            $igdbService = new IGDBService();
 
-        $apiGame = collect($games)->map(function ($game) {
-            return [
-                'id' => $game['id'],
-                'igdb_id' => $game['id'],
-                'title' => $game['name'] ?? 'Sin título',
-                'summary' => isset($game['summary']),
-                'storyline' => $game['storyline'] ?? null,
-                'cover_url' => isset($game['cover']['image_id'])
-                    ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$game['cover']['image_id']}.jpg"
+            $games = $igdbService->query('games', "
+            fields id, name, summary, storyline, cover.image_id, rating, first_release_date;
+            where id = {$igdb_id};
+        ");
+
+            $apiGame = collect($games)->first();
+
+            if (!$apiGame) {
+                abort(404, 'Juego no encontrado');
+            }
+
+            // Crear el juego local con todos los datos
+            $localGame = Game::create([
+                'igdb_id' => $apiGame['id'],
+                'title' => $apiGame['name'] ?? 'Sin título',
+                'summary' => $apiGame['summary'] ?? null,
+                'storyline' => $apiGame['storyline'] ?? null,
+                'cover_url' => isset($apiGame['cover']['image_id'])
+                    ? "https://images.igdb.com/igdb/image/upload/t_cover_big/{$apiGame['cover']['image_id']}.jpg"
                     : null,
-                'rating' => $game['rating'] ?? null,
-                'first_release_date' => isset($game['first_release_date'])
-                    ? \Carbon\Carbon::createFromTimestamp($game['first_release_date'])->toDateString()
+                'rating' => $apiGame['rating'] ?? null,
+                'release_date' => isset($apiGame['first_release_date'])
+                    ? \Carbon\Carbon::createFromTimestamp($apiGame['first_release_date'])->toDateString()
                     : null,
-            ];
-        })->first();
 
-        if (!$apiGame) {
-            abort(404, 'Juego no encontrado');
+            ]);
         }
 
-        // Buscar el juego en la base de datos o crearlo
-        $localGame = Game::firstOrCreate(
-            ['igdb_id' => $apiGame['id']],
-            ['title' => $apiGame['title']]
-        );
-
-        // Obtener las reviews relacionadas
+        // Cargar reviews relacionados al juego local
         $reviews = Review::with(['user', 'comments.user'])
             ->where('game_id', $localGame->id)
             ->latest()
             ->get();
 
+        // Devolver vista con datos locales
         return Inertia::render('GameDetail', [
-            'game' => $apiGame,
+            'game' => $localGame,
             'reviews' => $reviews,
         ]);
     }
@@ -107,7 +109,7 @@ class GamesController extends Controller
             $igdbService = new IGDBService();
 
             $query = "
-            fields name,cover.image_id,genres,summary,first_release_date;
+            fields name,cover.image_id,genres,summary,storyline,rating,first_release_date;
             where id = {$igdb_id};
         ";
             $results = $igdbService->query('games', $query);
@@ -122,7 +124,9 @@ class GamesController extends Controller
                 'igdb_id' => $data['id'],
                 'title' => $data['name'] ?? 'Sin título',
                 'summary' => $data['summary'] ?? null,
+                'storyline' => $data['storyline'] ?? null,
                 'genres' => $data['genres'] ?? null,
+                'rating' => isset($data['rating']) ? round($data['rating'], 2) : null,
                 'release_date' => isset($data['first_release_date'])
                     ? \Carbon\Carbon::createFromTimestamp($data['first_release_date'])->toDateString()
                     : null,
@@ -216,7 +220,7 @@ class GamesController extends Controller
         // Consulta final a IGDB
         $igdbQuery = $searchQuery .
             $filterString .
-            'fields name, summary, genres, cover.image_id, first_release_date, rating; ' .
+            'fields name, summary, storyline, genres, cover.image_id, rating, first_release_date, rating; ' .
             $sortQuery .
             "limit {$perPage}; offset {$offset};";
 
@@ -235,6 +239,7 @@ class GamesController extends Controller
                     'title' => $data['name'] ?? 'Sin título',
                     'summary' => $data['summary'] ?? null,
                     'storyline' => $data['storyline'] ?? null,
+                    'rating' => $data['rating'] ?? null,
                     'release_date' => isset($data['first_release_date'])
                         ? \Carbon\Carbon::createFromTimestamp($data['first_release_date'])->toDateString()
                         : null,

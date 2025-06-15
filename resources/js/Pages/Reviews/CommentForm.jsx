@@ -18,7 +18,7 @@ export default function CommentForm({ reviewId, comment = null, onCancel = null 
         comment_text: commentText,
       }, {
         onSuccess: () => {
-          if (onCancel) onCancel(); // Oculta el formulario si se edita correctamente
+          if (onCancel) onCancel();
         },
         preserveScroll: true,
       });

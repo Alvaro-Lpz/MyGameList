@@ -4,7 +4,6 @@ import Header from "@/Components/Header";
 import AddToList from "@/Components/AddToList";
 
 export default function Search() {
-
     const { search, genres, lists, filters } = usePage().props;
     const [q, setQ] = useState(filters.q || "");
     const [genreId, setGenreId] = useState(filters.genre_id || "");
@@ -35,7 +34,10 @@ export default function Search() {
                         Resultados
                     </h1>
 
-                    <form onSubmit={handleFilter} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <form
+                        onSubmit={handleFilter}
+                        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+                    >
                         <input
                             type="text"
                             placeholder="Buscar juego..."
@@ -50,7 +52,9 @@ export default function Search() {
                         >
                             <option value="">Todos los géneros</option>
                             {genres.map((genre) => (
-                                <option key={genre.id} value={genre.id}>{genre.name}</option>
+                                <option key={genre.id} value={genre.id}>
+                                    {genre.name}
+                                </option>
                             ))}
                         </select>
                         <input
@@ -88,12 +92,18 @@ export default function Search() {
                                     className="relative bg-gray-800 rounded-xl border border-purple-700 p-4 shadow-md hover:shadow-lg transition"
                                 >
                                     <div className="absolute top-3 right-3">
-                                        <AddToList gameId={game.igdb_id} lists={lists} />
+                                        <AddToList
+                                            gameId={game.igdb_id}
+                                            lists={lists}
+                                        />
                                     </div>
 
                                     {/* Todo el bloque debe estar dentro del Link */}
                                     <Link
-                                        href={route("game.detail", game.igdb_id)}
+                                        href={route(
+                                            "game.detail",
+                                            game.igdb_id
+                                        )}
                                         className="block"
                                     >
                                         {game.cover_url && (
@@ -108,7 +118,9 @@ export default function Search() {
                                         </h3>
                                         <div className="text-sm text-gray-400">
                                             {game.genres.length > 0
-                                                ? game.genres.map((g) => g.name).join(", ")
+                                                ? game.genres
+                                                      .map((g) => g.name)
+                                                      .join(", ")
                                                 : "Sin género"}
                                         </div>
                                     </Link>
@@ -116,9 +128,10 @@ export default function Search() {
                             ))}
                         </div>
                     ) : (
-                        <p className="text-gray-400 mt-6">No se encontraron resultados.</p>
+                        <p className="text-gray-400 mt-6">
+                            No se encontraron resultados.
+                        </p>
                     )}
-
 
                     {/* Paginación: fuera del grid */}
                     {search?.links?.length > 1 && (
@@ -128,18 +141,38 @@ export default function Search() {
                                     <button
                                         key={i}
                                         disabled={!link.url}
-                                        onClick={() => link.url && router.visit(link.url)}
-                                        className={`px-4 py-2 rounded border border-purple-500 text-sm ${link.active
-                                            ? "bg-neon-green text-black font-bold"
-                                            : "bg-gray-800 text-purple-300 hover:bg-purple-600"
-                                            }`}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                        onClick={() =>
+                                            link.url && router.visit(link.url)
+                                        }
+                                        className={`px-4 py-2 rounded border border-purple-500 text-sm ${
+                                            link.active
+                                                ? "bg-neon-green text-black font-bold"
+                                                : "bg-gray-800 text-purple-300 hover:bg-purple-600"
+                                        }`}
+                                        dangerouslySetInnerHTML={{
+                                            __html: link.label,
+                                        }}
                                     />
                                 ))}
                             </div>
                         </div>
                     )}
                 </div>
+                <footer className="mt-16 text-center text-sm text-gray-400 border-t border-purple-600 pt-6">
+                    <p className="mb-1">MyGameList</p>
+                    <p>
+                        Powered by{" "}
+                        <a
+                            href="https://www.igdb.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            style={{ color: "#7c7cf7" }}
+                        >
+                            IGDB
+                        </a>
+                    </p>
+                </footer>
             </div>
         </>
     );

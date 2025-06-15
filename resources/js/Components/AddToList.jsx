@@ -10,7 +10,7 @@ export default function AddToList({ gameId, lists, swiper }) {
     });
 
     const toggleList = (listId) => {
-        const current = data.lists || []; // por si se resetea accidentalmente
+        const current = data.lists || [];
 
         const updated = current.includes(listId)
             ? current.filter((id) => id !== listId)
@@ -27,7 +27,7 @@ export default function AddToList({ gameId, lists, swiper }) {
             onSuccess: () => {
                 setOpen(false);
                 swiper?.autoplay?.start();
-                setData("lists", []); // limpia selección
+                setData("lists", []);
             },
         });
     };

@@ -45,10 +45,10 @@ class GamesController extends Controller
 
     public function gameDetail($igdb_id)
     {
-        // 1. Buscar juego localmente
+        // Buscar juego localmente
         $localGame = Game::where('igdb_id', $igdb_id)->first();
 
-        // 2. Si no existe, consultar API y guardar
+        // Si no existe, consultar API y guardar
         if (!$localGame) {
             $igdbService = new IGDBService();
 
@@ -265,7 +265,7 @@ class GamesController extends Controller
             $games->push($game->load('genres'));
         }
 
-        // Paginación manual
+        // Paginacion manual
         $searchResults = [
             'data' => $games,
             'current_page' => $page,

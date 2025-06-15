@@ -8,13 +8,13 @@ export default function Lists() {
     const [open, setOpen] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        title: '',
-        description: '',
+        title: "",
+        description: "",
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('lists.store'), {
+        post(route("lists.store"), {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
@@ -29,7 +29,6 @@ export default function Lists() {
 
             <div className="min-h-screen bg-gray-900 text-white p-6">
                 <div className="max-w-6xl mx-auto">
-
                     <Nav user={user} auth={auth} />
 
                     {/* Formulario para crear nueva lista (solo para el dueño del perfil) */}
@@ -39,7 +38,7 @@ export default function Lists() {
                                 onClick={() => setOpen(!open)}
                                 className="bg-purple-700 hover:bg-purple-600 px-4 py-2 rounded font-semibold transition"
                             >
-                                {open ? 'Cancelar' : '+ Crear nueva lista'}
+                                {open ? "Cancelar" : "+ Crear nueva lista"}
                             </button>
 
                             {open && (
@@ -47,31 +46,48 @@ export default function Lists() {
                                     onSubmit={submit}
                                     className="mt-4 space-y-4 bg-gray-800 p-6 rounded-lg border border-purple-600"
                                 >
-                                    <h2 className="text-lg font-semibold text-purple-300">Nueva Lista</h2>
+                                    <h2 className="text-lg font-semibold text-purple-300">
+                                        Nueva Lista
+                                    </h2>
 
                                     <div>
-                                        <label className="block text-sm text-purple-200 mb-1">Título</label>
+                                        <label className="block text-sm text-purple-200 mb-1">
+                                            Título
+                                        </label>
                                         <input
                                             type="text"
                                             value={data.title}
-                                            onChange={(e) => setData('title', e.target.value)}
+                                            onChange={(e) =>
+                                                setData("title", e.target.value)
+                                            }
                                             className="w-full bg-gray-900 text-white rounded p-2 border border-purple-500"
                                         />
                                         {errors.title && (
-                                            <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {errors.title}
+                                            </p>
                                         )}
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm text-purple-200 mb-1">Descripción</label>
+                                        <label className="block text-sm text-purple-200 mb-1">
+                                            Descripción
+                                        </label>
                                         <textarea
                                             value={data.description}
-                                            onChange={(e) => setData('description', e.target.value)}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "description",
+                                                    e.target.value
+                                                )
+                                            }
                                             rows={3}
                                             className="w-full bg-gray-900 text-white rounded p-2 border border-purple-500"
                                         />
                                         {errors.description && (
-                                            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+                                            <p className="text-red-500 text-sm mt-1">
+                                                {errors.description}
+                                            </p>
                                         )}
                                     </div>
 
@@ -89,10 +105,14 @@ export default function Lists() {
 
                     {/* Contenido principal */}
                     <section>
-                        <h2 className="text-2xl font-bold text-purple-300 mb-6">Listas de {user.name}</h2>
+                        <h2 className="text-2xl font-bold text-purple-300 mb-6">
+                            Listas de {user.name}
+                        </h2>
 
                         {lists.data.length === 0 ? (
-                            <p className="text-gray-400">Este usuario no tiene listas públicas.</p>
+                            <p className="text-gray-400">
+                                Este usuario no tiene listas públicas.
+                            </p>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {lists.data.map((list) => (
@@ -100,42 +120,61 @@ export default function Lists() {
                                         key={list.id}
                                         className="bg-gray-800 border border-purple-600 rounded-xl p-4 shadow hover:shadow-lg transition relative"
                                     >
-                                        <h3 className="text-xl font-semibold text-neon-green mb-2 truncate">{list.title}</h3>
+                                        <h3 className="text-xl font-semibold text-neon-green mb-2 truncate">
+                                            {list.title}
+                                        </h3>
                                         <p className="text-gray-300 text-sm mb-4 line-clamp-3">
-                                            {list.description || "Sin descripción."}
+                                            {list.description ||
+                                                "Sin descripción."}
                                         </p>
 
                                         <div className="grid grid-cols-5 gap-2 mb-4">
-                                            {list.games.slice(0, 5).map((game) => (
-                                                <img
-                                                    key={game.id}
-                                                    src={game.cover_url}
-                                                    alt={game.title}
-                                                    className="w-full h-24 object-cover rounded"
-                                                />
-                                            ))}
+                                            {list.games
+                                                .slice(0, 5)
+                                                .map((game) => (
+                                                    <img
+                                                        key={game.id}
+                                                        src={game.cover_url}
+                                                        alt={game.title}
+                                                        className="w-full h-24 object-cover rounded"
+                                                    />
+                                                ))}
                                         </div>
 
                                         <div className="flex justify-between items-center mt-4">
                                             <Link
-                                                href={route("user.lists.show", { username: user.name, title: list.title })}
+                                                href={route("user.lists.show", {
+                                                    username: user.name,
+                                                    title: list.title,
+                                                })}
                                                 className="text-sm text-purple-300 hover:text-neon-green"
                                             >
                                                 Ver lista completa →
                                             </Link>
 
-                                            {auth.user && auth.user.id === list.user_id && (
-                                                <button
-                                                    onClick={() => {
-                                                        if (confirm("¿Seguro que deseas eliminar esta lista?")) {
-                                                            router.delete(route("lists.destroy", list.id));
-                                                        }
-                                                    }}
-                                                    className="text-sm text-red-400 hover:text-red-600"
-                                                >
-                                                    Eliminar
-                                                </button>
-                                            )}
+                                            {auth.user &&
+                                                auth.user.id ===
+                                                    list.user_id && (
+                                                    <button
+                                                        onClick={() => {
+                                                            if (
+                                                                confirm(
+                                                                    "¿Seguro que deseas eliminar esta lista?"
+                                                                )
+                                                            ) {
+                                                                router.delete(
+                                                                    route(
+                                                                        "lists.destroy",
+                                                                        list.id
+                                                                    )
+                                                                );
+                                                            }
+                                                        }}
+                                                        className="text-sm text-red-400 hover:text-red-600"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                )}
                                         </div>
                                     </div>
                                 ))}
@@ -149,12 +188,18 @@ export default function Lists() {
                                         <button
                                             key={i}
                                             disabled={!link.url}
-                                            onClick={() => link.url && router.visit(link.url)}
-                                            className={`px-4 py-2 rounded border border-purple-500 text-sm ${link.active
+                                            onClick={() =>
+                                                link.url &&
+                                                router.visit(link.url)
+                                            }
+                                            className={`px-4 py-2 rounded border border-purple-500 text-sm ${
+                                                link.active
                                                     ? "bg-neon-green text-black font-bold"
                                                     : "bg-gray-800 text-purple-300 hover:bg-purple-600"
-                                                }`}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                            }`}
+                                            dangerouslySetInnerHTML={{
+                                                __html: link.label,
+                                            }}
                                         />
                                     ))}
                                 </div>
@@ -162,6 +207,21 @@ export default function Lists() {
                         )}
                     </section>
                 </div>
+                <footer className="mt-16 text-center text-sm text-gray-400 border-t border-purple-600 pt-6">
+                    <p className="mb-1">MyGameList</p>
+                    <p>
+                        Powered by{" "}
+                        <a
+                            href="https://www.igdb.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            style={{ color: "#7c7cf7" }}
+                        >
+                            IGDB
+                        </a>
+                    </p>
+                </footer>
             </div>
         </>
     );

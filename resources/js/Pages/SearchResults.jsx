@@ -80,6 +80,21 @@ export default function SearchResults({ users, query }) {
                         ))}
                     </div>
                 </div>
+                <footer className="mt-16 text-center text-sm text-gray-400 border-t border-purple-600 pt-6">
+                    <p className="mb-1">MyGameList</p>
+                    <p>
+                        Powered by{" "}
+                        <a
+                            href="https://www.igdb.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            style={{ color: "#7c7cf7" }}
+                        >
+                            IGDB
+                        </a>
+                    </p>
+                </footer>
             </div>
         </>
     );

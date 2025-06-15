@@ -30,7 +30,10 @@ export default function GameDetail() {
                     {/* Botón para añadir a listas, solo si está autenticado */}
                     {auth?.user && (
                         <div className="flex justify-end mb-6">
-                            <AddToList gameId={game.igdb_id} lists={userLists} />
+                            <AddToList
+                                gameId={game.igdb_id}
+                                lists={userLists}
+                            />
                         </div>
                     )}
 
@@ -66,6 +69,21 @@ export default function GameDetail() {
                     <ReviewForm igdb_id={game.igdb_id} />
                     <ReviewList reviews={reviews} />
                 </div>
+                <footer className="mt-16 text-center text-sm text-gray-400 border-t border-purple-600 pt-6">
+                    <p className="mb-1">MyGameList</p>
+                    <p>
+                        Powered by{" "}
+                        <a
+                            href="https://www.igdb.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            style={{ color: "#7c7cf7" }}
+                        >
+                            IGDB
+                        </a>
+                    </p>
+                </footer>
             </div>
         </>
     );

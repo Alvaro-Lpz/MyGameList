@@ -82,16 +82,17 @@ export default function Profile() {
                                             {user.bio ||
                                                 "Este usuario aún no ha escrito una biografía."}
                                         </p>
-                                        {auth.user && auth.user.id === user.id && (
-                                            <button
-                                                onClick={() =>
-                                                    setEditingBio(true)
-                                                }
-                                                className="mt-2 text-sm text-purple-400 hover:text-neon-green transition"
-                                            >
-                                                Editar biografía
-                                            </button>
-                                        )}
+                                        {auth.user &&
+                                            auth.user.id === user.id && (
+                                                <button
+                                                    onClick={() =>
+                                                        setEditingBio(true)
+                                                    }
+                                                    className="mt-2 text-sm text-purple-400 hover:text-neon-green transition"
+                                                >
+                                                    Editar biografía
+                                                </button>
+                                            )}
                                     </>
                                 )}
                             </div>
@@ -253,6 +254,21 @@ export default function Profile() {
                         </section>
                     </div>
                 </div>
+                <footer className="mt-16 text-center text-sm text-gray-400 border-t border-purple-600 pt-6">
+                    <p className="mb-1">MyGameList</p>
+                    <p>
+                        Powered by{" "}
+                        <a
+                            href="https://www.igdb.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            style={{ color: "#7c7cf7" }}
+                        >
+                            IGDB
+                        </a>
+                    </p>
+                </footer>
             </div>
         </>
     );

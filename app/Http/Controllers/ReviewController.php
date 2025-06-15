@@ -21,7 +21,7 @@ class ReviewController extends Controller
         // Buscar el juego por igdb_id en la base de datos
         $game = Game::firstOrCreate(
             ['igdb_id' => $igdb_id],
-            ['title' => 'Título provisional'] // Puedes mejorar esto si quieres.
+            ['title' => 'Título provisional']
         );
 
         Review::create([

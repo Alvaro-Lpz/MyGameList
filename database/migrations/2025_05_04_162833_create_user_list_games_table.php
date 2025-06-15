@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::create('game_user_list', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('game_id')->unique();
-            $table->unsignedBigInteger('user_list_id')->unique();
+            $table->unsignedBigInteger('game_id');
+            $table->unsignedBigInteger('user_list_id');
             $table->timestamps();
 
             $table->foreign('game_id')->references('id')->on('games')->onDelete('cascade');
             $table->foreign('user_list_id')->references('id')->on('user_lists')->onDelete('cascade');
+
+            $table->unique(['game_id', 'user_list_id']);
         });
     }
 

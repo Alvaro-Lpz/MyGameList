@@ -88,7 +88,7 @@ export default function Search() {
                                     className="relative bg-gray-800 rounded-xl border border-purple-700 p-4 shadow-md hover:shadow-lg transition"
                                 >
                                     <div className="absolute top-3 right-3">
-                                        <AddToList gameId={game.id} lists={lists} />
+                                        <AddToList gameId={game.igdb_id} lists={lists} />
                                     </div>
 
                                     {/* Todo el bloque debe estar dentro del Link */}

@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('game_genre', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('game_id')->unique();
-            $table->unsignedBigInteger('genre_id')->unique();
+            $table->unsignedBigInteger('game_id');
+            $table->unsignedBigInteger('genre_id');
             $table->timestamps();
 
-            // $table->foreignId('game_id')->constrained()->onDelete('cascade');
-            // $table->foreignId('genre_id')->constrained()->onDelete('cascade');
+            // Definir claves foráneas con cascada
+            $table->foreign('game_id')->references('id')->on('games')->onDelete('cascade');
+            $table->foreign('genre_id')->references('id')->on('genres')->onDelete('cascade');
+
+            // Índice único compuesto para evitar duplicados
+            $table->unique(['game_id', 'genre_id']);
         });
     }
 

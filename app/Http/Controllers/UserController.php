@@ -33,7 +33,7 @@ class UserController extends Controller
         $recentReviews = $user->reviews()
             ->with('game', 'user')
             ->orderByDesc('created_at')
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         return Inertia::render('User/Profile', [
@@ -47,7 +47,7 @@ class UserController extends Controller
     public function showLists($username)
     {
         $user = User::where('name', $username)->firstOrFail();
-        $lists = $user->lists()->with('games')->paginate(10);
+        $lists = $user->lists()->with('games')->paginate(5);
 
         return Inertia::render('User/Lists', [
             'user' => $user,
@@ -62,7 +62,7 @@ class UserController extends Controller
         $reviews = Review::with('game', 'user')
             ->where('user_id', $user->id)
             ->latest()
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         return Inertia::render('User/Reviews', [
